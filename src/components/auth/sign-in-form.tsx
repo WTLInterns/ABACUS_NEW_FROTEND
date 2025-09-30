@@ -42,8 +42,7 @@ const defaultValues = { email: 'sofia@abacus.io', password: 'Secret1', accountTy
 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter();
-
-  const { checkSession } = useUser();
+  const { checkSession, user } = useUser();
 
   const [showPassword, setShowPassword] = React.useState<boolean>();
   const [isPending, setIsPending] = React.useState<boolean>(false);
@@ -57,8 +56,17 @@ export function SignInForm(): React.JSX.Element {
     control,
     handleSubmit,
     setError,
+    reset,
     formState: { errors },
   } = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
+
+  // Reset form when user changes
+  React.useEffect(() => {
+    if (!user) {
+      // Reset form to default values when user logs out
+      reset(defaultValues);
+    }
+  }, [user, reset]);
 
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
@@ -107,6 +115,11 @@ export function SignInForm(): React.JSX.Element {
       open: false,
     });
   };
+
+  // Force reset form when component mounts (fresh login page)
+  React.useEffect(() => {
+    reset(defaultValues);
+  }, [reset]);
 
   return (
     <Stack spacing={4}>

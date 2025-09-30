@@ -51,6 +51,26 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Expected
   }, []);
 
+  // Listen for storage changes to handle logout across tabs
+  React.useEffect(() => {
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'custom-auth-token') {
+        if (event.newValue === null) {
+          // Token was removed, user logged out
+          setState({ user: null, error: null, isLoading: false });
+        } else {
+          // Token was added/changed, check session
+          checkSession();
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [checkSession]);
+
   return <UserContext.Provider value={{ ...state, checkSession }}>{children}</UserContext.Provider>;
 }
 

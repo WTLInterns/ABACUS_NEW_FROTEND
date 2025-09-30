@@ -32,9 +32,10 @@ export function SideNav(): React.JSX.Element {
   const pathname = usePathname();
   const { checkSession, user } = useUser();
   const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+  const [currentNavItems, setCurrentNavItems] = React.useState<NavItemConfig[]>(navItems);
 
   // Determine which navigation items to show based on user role
-  const getNavItems = (): NavItemConfig[] => {
+  const getNavItems = React.useCallback((): NavItemConfig[] => {
     if (!user) return navItems;
     
     switch (user.role) {
@@ -45,7 +46,12 @@ export function SideNav(): React.JSX.Element {
       default:
         return navItems;
     }
-  };
+  }, [user]);
+
+  // Update navigation items when user changes
+  React.useEffect(() => {
+    setCurrentNavItems(getNavItems());
+  }, [user, getNavItems]);
 
   const handleSignOut = React.useCallback(async (): Promise<void> => {
     try {
@@ -59,7 +65,7 @@ export function SideNav(): React.JSX.Element {
       // Refresh the auth state
       await checkSession?.();
 
-      // Redirect to sign-in page
+      // Force a full page reload to ensure clean state
       window.location.href = paths.auth.signIn;
     } catch (error) {
       logger.error('Sign out error', error);
@@ -115,7 +121,7 @@ export function SideNav(): React.JSX.Element {
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
-        {renderNavItems({ pathname, items: getNavItems() })}
+        {renderNavItems({ pathname, items: currentNavItems })}
       </Box>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Stack spacing={2} sx={{ p: '12px' }}>

@@ -110,8 +110,21 @@ class AuthClient {
   }
 
   async signOut(): Promise<{ error?: string }> {
+    // Clear all user-related data from localStorage
     localStorage.removeItem('custom-auth-token');
     localStorage.removeItem('user-role');
+    
+    // Dispatch storage event to notify other tabs/components
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'custom-auth-token',
+        newValue: null,
+        oldValue: localStorage.getItem('custom-auth-token') || '',
+      }));
+    }
+    
+    // Clear any other user-specific data
+    // This ensures a clean state on logout
 
     return {};
   }
