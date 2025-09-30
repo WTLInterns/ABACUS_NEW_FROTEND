@@ -2,6 +2,12 @@ import * as React from 'react';
 import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import MenuItem from '@mui/material/MenuItem';
@@ -24,9 +30,15 @@ export interface UserPopoverProps {
 }
 
 export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): React.JSX.Element {
-  const { checkSession } = useUser();
+  const { checkSession, user } = useUser();
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
 
   const router = useRouter();
+
+  // Capitalize first letter of role
+  const capitalizeRole = (role: string) => {
+    return role.charAt(0).toUpperCase() + role.slice(1);
+  };
 
   const handleSignOut = React.useCallback(async (): Promise<void> => {
     try {
@@ -48,41 +60,99 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
     }
   }, [checkSession, router]);
 
+  const handleLogoutClick = (event: React.MouseEvent) => {
+    event.preventDefault();
+    onClose(); // Close the popover first
+    setOpenConfirmDialog(true);
+  };
+
+  const handleConfirmLogout = () => {
+    setOpenConfirmDialog(false);
+    handleSignOut();
+  };
+
+  const handleCancelLogout = () => {
+    setOpenConfirmDialog(false);
+  };
+
   return (
-    <Popover
-      anchorEl={anchorEl}
-      anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
-      onClose={onClose}
-      open={open}
-      slotProps={{ paper: { sx: { width: '240px' } } }}
-    >
-      <Box sx={{ p: '16px 20px ' }}>
-        <Typography variant="subtitle1">Sofia Rivers</Typography>
-        <Typography color="text.secondary" variant="body2">
-          sofia.rivers@devias.io
-        </Typography>
-      </Box>
-      <Divider />
-      <MenuList disablePadding sx={{ p: '8px', '& .MuiMenuItem-root': { borderRadius: 1 } }}>
-        <MenuItem component={RouterLink} href={paths.dashboard.settings} onClick={onClose}>
-          <ListItemIcon>
-            <GearSixIcon fontSize="var(--icon-fontSize-md)" />
-          </ListItemIcon>
-          Settings
-        </MenuItem>
-        <MenuItem component={RouterLink} href={paths.dashboard.account} onClick={onClose}>
-          <ListItemIcon>
-            <UserIcon fontSize="var(--icon-fontSize-md)" />
-          </ListItemIcon>
-          Profile
-        </MenuItem>
-        <MenuItem onClick={handleSignOut}>
-          <ListItemIcon>
-            <SignOutIcon fontSize="var(--icon-fontSize-md)" />
-          </ListItemIcon>
-          Sign out
-        </MenuItem>
-      </MenuList>
-    </Popover>
+    <React.Fragment>
+      <Popover
+        anchorEl={anchorEl}
+        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+        onClose={onClose}
+        open={open}
+        slotProps={{ paper: { sx: { width: '240px' } } }}
+      >
+        <Box sx={{ p: '16px 20px ' }}>
+          {user ? (
+            <>
+              <Typography variant="subtitle1">
+                {user.firstName} {user.lastName}
+              </Typography>
+              <Typography color="text.secondary" variant="body2">
+                {user.email}
+              </Typography>
+              <Typography color="text.secondary" variant="body2" sx={{ mt: 1 }}>
+                {capitalizeRole(user.role || 'User')}
+              </Typography>
+            </>
+          ) : (
+            <>
+              <Typography variant="subtitle1">Guest User</Typography>
+              <Typography color="text.secondary" variant="body2">
+                user@example.com
+              </Typography>
+            </>
+          )}
+        </Box>
+        <Divider />
+        <MenuList disablePadding sx={{ p: '8px', '& .MuiMenuItem-root': { borderRadius: 1 } }}>
+          <MenuItem component={RouterLink} href={paths.dashboard.settings} onClick={onClose}>
+            <ListItemIcon>
+              <GearSixIcon fontSize="var(--icon-fontSize-md)" />
+            </ListItemIcon>
+            Settings
+          </MenuItem>
+          <MenuItem component={RouterLink} href={paths.dashboard.account} onClick={onClose}>
+            <ListItemIcon>
+              <UserIcon fontSize="var(--icon-fontSize-md)" />
+            </ListItemIcon>
+            Profile
+          </MenuItem>
+          <MenuItem onClick={handleLogoutClick}>
+            <ListItemIcon>
+              <SignOutIcon fontSize="var(--icon-fontSize-md)" />
+            </ListItemIcon>
+            Sign out
+          </MenuItem>
+        </MenuList>
+      </Popover>
+      
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={openConfirmDialog}
+        onClose={handleCancelLogout}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Confirm Logout
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to logout?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelLogout} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmLogout} color="primary" autoFocus>
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </React.Fragment>
   );
 }

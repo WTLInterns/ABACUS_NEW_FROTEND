@@ -8,12 +8,22 @@ function generateToken(): string {
   return Array.from(arr, (v) => v.toString(16).padStart(2, '0')).join('');
 }
 
+// For demo purposes, we'll determine role based on email
+const getUserRole = (email: string): 'teacher' | 'admin' => {
+  // In a real app, this would come from the server
+  if (email === 'admin@abacus.io') {
+    return 'admin';
+  }
+  return 'teacher';
+};
+
 const user = {
   id: 'USR-000',
   avatar: '/assets/avatar.png',
   firstName: 'Sofia',
   lastName: 'Rivers',
-  email: 'sofia@devias.io',
+  email: 'sofia@abacus.io',
+  role: 'teacher',
 } satisfies User;
 
 export interface SignUpParams {
@@ -30,6 +40,7 @@ export interface SignInWithOAuthParams {
 export interface SignInWithPasswordParams {
   email: string;
   password: string;
+  accountType: 'teacher' | 'admin';
 }
 
 export interface ResetPasswordParams {
@@ -52,14 +63,20 @@ class AuthClient {
   }
 
   async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
-    const { email, password } = params;
+    const { email, password, accountType } = params;
 
     // Make API request
 
     // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
-    if (email !== 'sofia@devias.io' || password !== 'Secret1') {
+    if (email !== 'sofia@abacus.io' || password !== 'Secret1') {
       return { error: 'Invalid credentials' };
     }
+
+    // Set role based on account type
+    const userWithRole = { ...user, role: accountType };
+    
+    // Store role in localStorage for retrieval
+    localStorage.setItem('user-role', accountType);
 
     const token = generateToken();
     localStorage.setItem('custom-auth-token', token);
@@ -85,11 +102,16 @@ class AuthClient {
       return { data: null };
     }
 
-    return { data: user };
+    // Get role from localStorage
+    const role = localStorage.getItem('user-role') as 'teacher' | 'admin' || 'teacher';
+    const userWithRole = { ...user, role };
+
+    return { data: userWithRole };
   }
 
   async signOut(): Promise<{ error?: string }> {
     localStorage.removeItem('custom-auth-token');
+    localStorage.removeItem('user-role');
 
     return {};
   }

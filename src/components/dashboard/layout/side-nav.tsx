@@ -5,22 +5,79 @@ import RouterLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { ArrowSquareUpRightIcon } from '@phosphor-icons/react/dist/ssr/ArrowSquareUpRight';
 import { CaretUpDownIcon } from '@phosphor-icons/react/dist/ssr/CaretUpDown';
+import { SignOutIcon } from '@phosphor-icons/react/dist/ssr/SignOut';
 
 import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
+import { authClient } from '@/lib/auth/client';
+import { useUser } from '@/hooks/use-user';
+import { logger } from '@/lib/default-logger';
 
-import { navItems } from './config';
+import { navItems, teacherNavItems, adminNavItems } from './config';
 import { navIcons } from './nav-icons';
 
 export function SideNav(): React.JSX.Element {
   const pathname = usePathname();
+  const { checkSession, user } = useUser();
+  const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
+
+  // Determine which navigation items to show based on user role
+  const getNavItems = (): NavItemConfig[] => {
+    if (!user) return navItems;
+    
+    switch (user.role) {
+      case 'teacher':
+        return teacherNavItems;
+      case 'admin':
+        return adminNavItems;
+      default:
+        return navItems;
+    }
+  };
+
+  const handleSignOut = React.useCallback(async (): Promise<void> => {
+    try {
+      const { error } = await authClient.signOut();
+
+      if (error) {
+        logger.error('Sign out error', error);
+        return;
+      }
+
+      // Refresh the auth state
+      await checkSession?.();
+
+      // Redirect to sign-in page
+      window.location.href = paths.auth.signIn;
+    } catch (error) {
+      logger.error('Sign out error', error);
+    }
+  }, [checkSession]);
+
+  const handleLogoutClick = () => {
+    setOpenConfirmDialog(true);
+  };
+
+  const handleConfirmLogout = () => {
+    setOpenConfirmDialog(false);
+    handleSignOut();
+  };
+
+  const handleCancelLogout = () => {
+    setOpenConfirmDialog(false);
+  };
 
   return (
     <Box
@@ -54,62 +111,55 @@ export function SideNav(): React.JSX.Element {
         <Box component={RouterLink} href={paths.home} sx={{ display: 'inline-flex' }}>
           <Logo color="light" height={32} width={122} />
         </Box>
-        <Box
-          sx={{
-            alignItems: 'center',
-            backgroundColor: 'var(--mui-palette-neutral-950)',
-            border: '1px solid var(--mui-palette-neutral-700)',
-            borderRadius: '12px',
-            cursor: 'pointer',
-            display: 'flex',
-            p: '4px 12px',
-          }}
-        >
-          <Box sx={{ flex: '1 1 auto' }}>
-            <Typography color="var(--mui-palette-neutral-400)" variant="body2">
-              Workspace
-            </Typography>
-            <Typography color="inherit" variant="subtitle1">
-              Devias
-            </Typography>
-          </Box>
-          <CaretUpDownIcon />
-        </Box>
+      
       </Stack>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
-        {renderNavItems({ pathname, items: navItems })}
+        {renderNavItems({ pathname, items: getNavItems() })}
       </Box>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       <Stack spacing={2} sx={{ p: '12px' }}>
-        <div>
-          <Typography color="var(--mui-palette-neutral-100)" variant="subtitle2">
-            Need more features?
-          </Typography>
-          <Typography color="var(--mui-palette-neutral-400)" variant="body2">
-            Check out our Pro solution template.
-          </Typography>
-        </div>
-        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-          <Box
-            component="img"
-            alt="Pro version"
-            src="/assets/devias-kit-pro.png"
-            sx={{ height: 'auto', width: '160px' }}
-          />
-        </Box>
         <Button
-          component="a"
-          endIcon={<ArrowSquareUpRightIcon fontSize="var(--icon-fontSize-md)" />}
           fullWidth
-          href="https://material-kit-pro-react.devias.io/"
-          sx={{ mt: 2 }}
-          target="_blank"
-          variant="contained"
+          onClick={handleLogoutClick}
+          startIcon={<SignOutIcon fontSize="var(--icon-fontSize-md)" />}
+          sx={{
+            justifyContent: 'flex-start',
+            color: 'var(--NavItem-color)',
+            '&:hover': {
+              backgroundColor: 'var(--NavItem-hover-background)',
+            },
+          }}
+          variant="text"
         >
-          Pro version
+          Logout
         </Button>
       </Stack>
+      
+      {/* Confirmation Dialog */}
+      <Dialog
+        open={openConfirmDialog}
+        onClose={handleCancelLogout}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          Confirm Logout
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to logout?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelLogout} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmLogout} color="primary" autoFocus>
+            Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

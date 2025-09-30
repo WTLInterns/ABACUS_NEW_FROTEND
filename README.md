@@ -1,90 +1,134 @@
-## [Devias Kit - React](https://material-kit-react.devias.io/)
+# Abacus - Material Kit React
 
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
+A professional dashboard application built with Next.js 15, TypeScript, and Material UI.
 
-[![Devias Kit - React](https://github.com/devias-io/material-kit-react/blob/main/public/assets/thumbnail.png)](https://material-kit-react.devias.io/)
+### Pages
 
-> Free React Admin Dashboard made with [MUI's](https://mui.com) components, [React](https://reactjs.org) and of course [Next.js](https://github.com/vercel/next.js) to boost your app development process!
+- [Dashboard](https://material-kit-react.abacus.io)
+- [Customers](https://material-kit-react.abacus.io/dashboard/customers)
+- [Integrations](https://material-kit-react.abacus.io/dashboard/integrations)
+- [Settings](https://material-kit-react.abacus.io/dashboard/settings)
+- [Account](https://material-kit-react.abacus.io/dashboard/account)
+- [Sign In](https://material-kit-react.abacus.io/auth/sign-in)
+- [Sign Up](https://material-kit-react.abacus.io/auth/sign-up)
+- [Reset Password](https://material-kit-react.abacus.io/auth/reset-password)
 
-## Pages 
+## Technology Stack
 
-- [Dashboard](https://material-kit-react.devias.io)
-- [Customers](https://material-kit-react.devias.io/dashboard/customers)
-- [Integrations](https://material-kit-react.devias.io/dashboard/integrations)
-- [Settings](https://material-kit-react.devias.io/dashboard/settings)
-- [Account](https://material-kit-react.devias.io/dashboard/account)
-- [Sign In](https://material-kit-react.devias.io/auth/sign-in)
-- [Sign Up](https://material-kit-react.devias.io/auth/sign-up)
-- [Reset Password](https://material-kit-react.devias.io/auth/reset-password)
+This project is built using modern web technologies:
 
-## Free Figma Community File
+### Core Framework
+- **Next.js 15** - React framework for production with App Router
+- **React 19** - Latest version of the popular UI library
+- **TypeScript** - Typed superset of JavaScript for enhanced developer experience
 
-- [Duplicate File](https://www.figma.com/file/b3L1Np4RYiicZAOMopHNkm/Devias-Dashboard-Design-Library-Kit)
+### UI Components & Styling
+- **Material UI 7** - Comprehensive component library implementing Material Design
+- **Emotion** - CSS-in-JS library for styling components
+- **@fontsource** - Self-hosted open source fonts
 
-## Upgrade to PRO Version
+### Data Visualization
+- **ApexCharts** - Modern charting library
+- **react-apexcharts** - React wrapper for ApexCharts
 
-We also have a pro version of this product which bundles even more pages and components if you want
-to save more time and design efforts :)
+### Form Handling
+- **React Hook Form** - Performant, flexible forms with easy validation
+- **Zod** - TypeScript-first schema declaration and validation library
 
-| Free Version (this one)  | [Devias Kit Pro](https://mui.com/store/items/devias-kit-pro/)                |
-| ------------------------ | :--------------------------------------------------------------------------- |
-| **8** Pages              | **80+** Pages                                                                |
-| ✔ Custom Authentication  | ✔ Authentication with **Amplify**, **Auth0**, **Firebase** and **Supabase**  |
-| -                        | ✔ Vite Version                                                               |
-| -                        | ✔ Dark Mode Support                                                          |
-| -                        | ✔ Complete Users Flows                                                       |
-| -                        | ✔ Premium Technical Support                                                  |
+### Icons
+- **Phosphor Icons** - Clean and versatile icon family
 
-## Quick start
+### Utilities
+- **Day.js** - Fast 2kB alternative to Moment.js with the same modern API
 
-- Clone the repo: `git clone https://github.com/devias-io/material-kit-react.git`
-- Make sure your Node.js and npm versions are up to date
-- Install dependencies: `npm install` or `yarn`
-- Start the server: `npm run dev` or `yarn dev`
-- Open browser: `http://localhost:3000`
+### Development & Testing Tools
+- **ESLint** - Pluggable JavaScript linter
+- **Prettier** - Opinionated code formatter
+- **Jest** - Delightful JavaScript testing framework
+- **Testing Library** - Simple and complete testing utilities
 
-## File Structure
+## Key Features
 
-Within the download you'll find the following directories and files:
+- Responsive dashboard layout with navigation
+- Authentication system (sign in, sign up, password reset)
+- Customer management
+- Integration cards
+- Account settings
+- Dark/light mode support
+- Form validation with Zod schemas
+- Data visualization with charts
+- Context-based state management
+- TypeScript type safety throughout
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ installed
+- npm, yarn, or pnpm package manager
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
+
+### Development
+
+Run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+### Building for Production
+
+```bash
+npm run build
+# or
+yarn build
+# or
+pnpm build
+```
+
+### Deployment
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+## Project Structure
 
 ```
-┌── .editorconfig
-├── .eslintrc.js
-├── .gitignore
-├── CHANGELOG.md
-├── LICENSE.md
-├── next-env.d.ts
-├── next.config.js
-├── package.json
-├── README.md
-├── tsconfig.json
-├── public
-└── src
-	├── components
-	├── contexts
-	├── hooks
-	├── lib
-	├── styles
-	├── types
-	└── app
-		├── layout.tsx
-		├── page.tsx
-		├── auth
-		└── dashboard
+src/
+├── app/                 # Next.js App Router pages and layouts
+│   ├── auth/           # Authentication pages
+│   ├── dashboard/      # Dashboard pages
+│   └── ...
+├── components/         # Reusable UI components
+├── contexts/           # React context providers
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions and libraries
+├── styles/             # Theme and global styles
+└── types/              # TypeScript type definitions
 ```
-
-## Resources
-
-- More freebies like this one: https://devias.io
-
-## Reporting Issues:
-
-- [Github Issues Page](https://github.com/devias-io/material-kit-react/issues)
 
 ## License
 
-- Licensed under [MIT](https://github.com/devias-io/material-kit-react/blob/main/LICENSE.md)
-
-## Contact Us
-
-- Email Us: support@deviasio.zendesk.com
+This project is licensed under the MIT License.

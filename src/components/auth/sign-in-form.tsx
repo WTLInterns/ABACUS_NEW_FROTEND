@@ -13,6 +13,9 @@ import Link from '@mui/material/Link';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Snackbar from '@mui/material/Snackbar';
 import { EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
 import { EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
 import { Controller, useForm } from 'react-hook-form';
@@ -21,15 +24,21 @@ import { z as zod } from 'zod';
 import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
+import type { SignInWithPasswordParams } from '@/lib/auth/client';
 
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
   password: zod.string().min(1, { message: 'Password is required' }),
+  accountType: zod.enum(['teacher', 'admin'], { message: 'Account type is required' }),
 });
 
-type Values = zod.infer<typeof schema>;
+type Values = {
+  email: string;
+  password: string;
+  accountType: 'teacher' | 'admin';
+};
 
-const defaultValues = { email: 'sofia@devias.io', password: 'Secret1' } satisfies Values;
+const defaultValues = { email: 'sofia@abacus.io', password: 'Secret1', accountType: 'teacher' } satisfies Values;
 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter();
@@ -37,8 +46,12 @@ export function SignInForm(): React.JSX.Element {
   const { checkSession } = useUser();
 
   const [showPassword, setShowPassword] = React.useState<boolean>();
-
   const [isPending, setIsPending] = React.useState<boolean>(false);
+  const [notification, setNotification] = React.useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
+    open: false,
+    message: '',
+    severity: 'success',
+  });
 
   const {
     control,
@@ -51,13 +64,32 @@ export function SignInForm(): React.JSX.Element {
     async (values: Values): Promise<void> => {
       setIsPending(true);
 
-      const { error } = await authClient.signInWithPassword(values);
+      // The values object matches the SignInWithPasswordParams interface
+      const params: SignInWithPasswordParams = {
+        email: values.email,
+        password: values.password,
+        accountType: values.accountType,
+      };
+
+      const { error } = await authClient.signInWithPassword(params);
 
       if (error) {
-        setError('root', { type: 'server', message: error });
+        // Show error notification
+        setNotification({
+          open: true,
+          message: error,
+          severity: 'error',
+        });
         setIsPending(false);
         return;
       }
+
+      // Show success notification
+      setNotification({
+        open: true,
+        message: 'Successfully signed in! Redirecting...',
+        severity: 'success',
+      });
 
       // Refresh the auth state
       await checkSession?.();
@@ -69,19 +101,34 @@ export function SignInForm(): React.JSX.Element {
     [checkSession, router, setError]
   );
 
+  const handleCloseNotification = () => {
+    setNotification({
+      ...notification,
+      open: false,
+    });
+  };
+
   return (
     <Stack spacing={4}>
       <Stack spacing={1}>
         <Typography variant="h4">Sign in</Typography>
-        <Typography color="text.secondary" variant="body2">
-          Don&apos;t have an account?{' '}
-          <Link component={RouterLink} href={paths.auth.signUp} underline="hover" variant="subtitle2">
-            Sign up
-          </Link>
-        </Typography>
       </Stack>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Stack spacing={2}>
+          <Controller
+            control={control}
+            name="accountType"
+            render={({ field }) => (
+              <FormControl error={Boolean(errors.accountType)}>
+                <InputLabel>Account Type</InputLabel>
+                <Select {...field} label="Account Type">
+                  <MenuItem value="teacher">Teacher</MenuItem>
+                  <MenuItem value="admin">Admin</MenuItem>
+                </Select>
+                {errors.accountType ? <FormHelperText>{errors.accountType.message}</FormHelperText> : null}
+              </FormControl>
+            )}
+          />
           <Controller
             control={control}
             name="email"
@@ -138,16 +185,20 @@ export function SignInForm(): React.JSX.Element {
           </Button>
         </Stack>
       </form>
-      <Alert color="warning">
-        Use{' '}
-        <Typography component="span" sx={{ fontWeight: 700 }} variant="inherit">
-          sofia@devias.io
-        </Typography>{' '}
-        with password{' '}
-        <Typography component="span" sx={{ fontWeight: 700 }} variant="inherit">
-          Secret1
-        </Typography>
-      </Alert>
+      <Snackbar
+        open={notification.open}
+        autoHideDuration={6000}
+        onClose={handleCloseNotification}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert 
+          onClose={handleCloseNotification} 
+          severity={notification.severity} 
+          sx={{ width: '100%' }}
+        >
+          {notification.message}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 }
