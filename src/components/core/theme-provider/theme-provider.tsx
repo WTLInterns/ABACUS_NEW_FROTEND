@@ -2,9 +2,10 @@
 
 import * as React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from '@mui/material/styles';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 
 import { createTheme } from '@/styles/theme/create-theme';
+import { useTheme } from '@/contexts/theme-context';
 
 import EmotionCache from './emotion-cache';
 
@@ -13,14 +14,15 @@ export interface ThemeProviderProps {
 }
 
 function CustomThemeProvider({ children }: ThemeProviderProps): React.JSX.Element {
+  const { mode } = useTheme();
   const theme = createTheme();
 
   return (
     <EmotionCache options={{ key: 'mui' }}>
-      <ThemeProvider disableTransitionOnChange theme={theme} defaultMode="light">
+      <MuiThemeProvider theme={theme} defaultMode={mode}>
         <CssBaseline />
         {children}
-      </ThemeProvider>
+      </MuiThemeProvider>
     </EmotionCache>
   );
 }

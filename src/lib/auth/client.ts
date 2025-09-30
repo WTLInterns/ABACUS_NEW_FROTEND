@@ -1,31 +1,24 @@
-'use client';
+import { User } from '@/types/user';
+import { authService, LoginRequest } from '@/services';
 
-import type { User } from '@/types/user';
-
+// Generate a random token for demo purposes
 function generateToken(): string {
-  const arr = new Uint8Array(12);
-  globalThis.crypto.getRandomValues(arr);
-  return Array.from(arr, (v) => v.toString(16).padStart(2, '0')).join('');
+  return Math.random().toString(36).substring(2);
 }
 
-// For demo purposes, we'll determine role based on email
-const getUserRole = (email: string): 'teacher' | 'admin' => {
-  // In a real app, this would come from the server
-  if (email === 'admin@abacus.io') {
-    return 'admin';
-  }
-  return 'teacher';
-};
+// Define the parameters for sign in
+export interface SignInWithPasswordParams {
+  email: string;
+  password: string;
+  accountType: 'teacher' | 'admin' | 'master_admin';
+}
 
-const user = {
-  id: 'USR-000',
-  avatar: '/assets/avatar.png',
-  firstName: 'Sofia',
-  lastName: 'Rivers',
-  email: 'sofia@abacus.io',
-  role: 'teacher',
-} satisfies User;
+// Define the parameters for reset password
+export interface ResetPasswordParams {
+  email: string;
+}
 
+// Define the parameters for sign up
 export interface SignUpParams {
   firstName: string;
   lastName: string;
@@ -33,101 +26,99 @@ export interface SignUpParams {
   password: string;
 }
 
-export interface SignInWithOAuthParams {
-  provider: 'google' | 'discord';
+// Define the client methods
+export interface AuthClient {
+  signUp: (params: SignUpParams) => Promise<{ error?: string }>;
+  signInWithPassword: (params: SignInWithPasswordParams) => Promise<{ error?: string; data?: User }>;
+  resetPassword: (params: ResetPasswordParams) => Promise<{ error?: string }>;
+  signOut: () => Promise<{ error?: string }>;
+  getUser: () => Promise<{ error?: string; data?: User }>;
 }
 
-export interface SignInWithPasswordParams {
-  email: string;
-  password: string;
-  accountType: 'teacher' | 'admin';
-}
-
-export interface ResetPasswordParams {
-  email: string;
-}
-
-class AuthClient {
-  async signUp(_: SignUpParams): Promise<{ error?: string }> {
-    // Make API request
-
-    // We do not handle the API, so we'll just generate a token and store it in localStorage.
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
-
-    return {};
+// Implement the client
+class AuthClientImpl implements AuthClient {
+  async signUp(params: SignUpParams): Promise<{ error?: string }> {
+    // In a real implementation, this would call an API endpoint
+    // For now, we'll just simulate success
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // In a real app, you would call:
+      // await apiClient.post('/auth/sign-up', params);
+      
+      return { error: undefined };
+    } catch (error) {
+      console.error('Sign up error:', error);
+      return { error: 'Failed to sign up. Please try again.' };
+    }
   }
 
-  async signInWithOAuth(_: SignInWithOAuthParams): Promise<{ error?: string }> {
-    return { error: 'Social authentication not implemented' };
-  }
-
-  async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
+  async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string; data?: User }> {
     const { email, password, accountType } = params;
-
-    // Make API request
-
-    // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
-    if (email !== 'sofia@abacus.io' || password !== 'Secret1') {
-      return { error: 'Invalid credentials' };
-    }
-
-    // Set role based on account type
-    const userWithRole = { ...user, role: accountType };
     
-    // Store role in localStorage for retrieval
-    localStorage.setItem('user-role', accountType);
+    // Create credentials object
+    const credentials: LoginRequest = { email, password };
 
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
-
-    return {};
-  }
-
-  async resetPassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: 'Password reset not implemented' };
-  }
-
-  async updatePassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: 'Update reset not implemented' };
-  }
-
-  async getUser(): Promise<{ data?: User | null; error?: string }> {
-    // Make API request
-
-    // We do not handle the API, so just check if we have a token in localStorage.
-    const token = localStorage.getItem('custom-auth-token');
-
-    if (!token) {
-      return { data: null };
+    try {
+      // Determine which login method to call based on account type
+      if (accountType === 'master_admin') {
+        return await authService.masterAdminLogin(credentials);
+      } else {
+        // For teacher or admin, use teacher login
+        return await authService.teacherLogin(credentials);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      return { error: 'Network error. Please try again.' };
     }
+  }
 
-    // Get role from localStorage
-    const role = localStorage.getItem('user-role') as 'teacher' | 'admin' || 'teacher';
-    const userWithRole = { ...user, role };
-
-    return { data: userWithRole };
+  async resetPassword(params: ResetPasswordParams): Promise<{ error?: string }> {
+    // In a real implementation, this would call an API endpoint
+    // For now, we'll just simulate success
+    try {
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // In a real app, you would call:
+      // await apiClient.post('/auth/reset-password', { email: params.email });
+      
+      return { error: undefined };
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return { error: 'Failed to send reset password email. Please try again.' };
+    }
   }
 
   async signOut(): Promise<{ error?: string }> {
-    // Clear all user-related data from localStorage
-    localStorage.removeItem('custom-auth-token');
-    localStorage.removeItem('user-role');
-    
-    // Dispatch storage event to notify other tabs/components
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new StorageEvent('storage', {
-        key: 'custom-auth-token',
-        newValue: null,
-        oldValue: localStorage.getItem('custom-auth-token') || '',
-      }));
+    try {
+      authService.logout();
+      return { error: undefined };
+    } catch (error) {
+      console.error('Sign out error:', error);
+      return { error: 'Failed to sign out. Please try again.' };
     }
-    
-    // Clear any other user-specific data
-    // This ensures a clean state on logout
+  }
 
-    return {};
+  async getUser(): Promise<{ error?: string; data?: User }> {
+    // In a real implementation, this would call an API endpoint to get user data
+    // For now, we'll retrieve user data from localStorage
+    try {
+      const userData = localStorage.getItem('user-data');
+      
+      if (!userData) {
+        return { error: 'User not found' };
+      }
+      
+      const user: User = JSON.parse(userData);
+      return { data: user };
+    } catch (error) {
+      console.error('Get user error:', error);
+      return { error: 'Failed to get user data. Please try again.' };
+    }
   }
 }
 
-export const authClient = new AuthClient();
+// Export the client instance
+export const authClient = new AuthClientImpl();

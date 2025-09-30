@@ -2,19 +2,19 @@
 
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
-import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { BellIcon } from '@phosphor-icons/react/dist/ssr/Bell';
 import { ListIcon } from '@phosphor-icons/react/dist/ssr/List';
 import { MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
-import { UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
+import { MoonIcon } from '@phosphor-icons/react/dist/ssr/Moon';
+import { SunIcon } from '@phosphor-icons/react/dist/ssr/Sun';
 
 import { usePopover } from '@/hooks/use-popover';
 import { useUser } from '@/hooks/use-user';
+import { useTheme } from '@/contexts/theme-context';
 
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
@@ -22,6 +22,7 @@ import { UserPopover } from './user-popover';
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
   const { user } = useUser();
+  const { mode, toggleMode } = useTheme();
 
   const userPopover = usePopover<HTMLDivElement>();
 
@@ -68,18 +69,7 @@ export function MainNav(): React.JSX.Element {
                 Welcome {capitalizeRole(user.role || 'User')}, {user.firstName} {user.lastName}
               </Typography>
             )}
-            <Tooltip title="Contacts">
-              <IconButton>
-                <UsersIcon />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Notifications">
-              <Badge badgeContent={4} color="success" variant="dot">
-                <IconButton>
-                  <BellIcon />
-                </IconButton>
-              </Badge>
-            </Tooltip>
+
             <Avatar
               onClick={userPopover.handleOpen}
               ref={userPopover.anchorRef}

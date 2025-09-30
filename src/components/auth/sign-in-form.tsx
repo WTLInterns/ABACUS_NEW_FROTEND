@@ -29,16 +29,16 @@ import type { SignInWithPasswordParams } from '@/lib/auth/client';
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
   password: zod.string().min(1, { message: 'Password is required' }),
-  accountType: zod.enum(['teacher', 'admin'], { message: 'Account type is required' }),
+  accountType: zod.enum(['teacher', 'admin', 'master_admin'], { message: 'Account type is required' }),
 });
 
 type Values = {
   email: string;
   password: string;
-  accountType: 'teacher' | 'admin';
+  accountType: 'teacher' | 'admin' | 'master_admin';
 };
 
-const defaultValues = { email: 'sofia@abacus.io', password: 'Secret1', accountType: 'teacher' } satisfies Values;
+const defaultValues = { email: 'jawa@gmail.com', password: 'Secret1', accountType: 'master_admin' } satisfies Values;
 
 export function SignInForm(): React.JSX.Element {
   const router = useRouter();
@@ -68,6 +68,11 @@ export function SignInForm(): React.JSX.Element {
     }
   }, [user, reset]);
 
+  // Force reset form when component mounts (fresh login page)
+  React.useEffect(() => {
+    reset(defaultValues);
+  }, [reset]);
+
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
       setIsPending(true);
@@ -79,7 +84,7 @@ export function SignInForm(): React.JSX.Element {
         accountType: values.accountType,
       };
 
-      const { error } = await authClient.signInWithPassword(params);
+      const { error, data } = await authClient.signInWithPassword(params);
 
       if (error) {
         // Show error notification
@@ -116,11 +121,6 @@ export function SignInForm(): React.JSX.Element {
     });
   };
 
-  // Force reset form when component mounts (fresh login page)
-  React.useEffect(() => {
-    reset(defaultValues);
-  }, [reset]);
-
   return (
     <Stack spacing={4}>
       <Stack spacing={1}>
@@ -137,6 +137,7 @@ export function SignInForm(): React.JSX.Element {
                 <Select {...field} label="Account Type">
                   <MenuItem value="teacher">Teacher</MenuItem>
                   <MenuItem value="admin">Admin</MenuItem>
+                  <MenuItem value="master_admin">Master Admin</MenuItem>
                 </Select>
                 {errors.accountType ? <FormHelperText>{errors.accountType.message}</FormHelperText> : null}
               </FormControl>

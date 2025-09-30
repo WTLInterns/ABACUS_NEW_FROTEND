@@ -25,7 +25,7 @@ import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 import { logger } from '@/lib/default-logger';
 
-import { navItems, teacherNavItems, adminNavItems } from './config';
+import { navItems, teacherNavItems, adminNavItems, masterAdminNavItems } from './config';
 import { navIcons } from './nav-icons';
 
 export function SideNav(): React.JSX.Element {
@@ -43,6 +43,8 @@ export function SideNav(): React.JSX.Element {
         return teacherNavItems;
       case 'admin':
         return adminNavItems;
+      case 'master_admin':
+        return masterAdminNavItems;
       default:
         return navItems;
     }

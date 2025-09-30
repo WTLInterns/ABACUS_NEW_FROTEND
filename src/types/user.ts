@@ -5,7 +5,7 @@ export interface User {
   name?: string;
   avatar?: string;
   email?: string;
-  role?: 'teacher' | 'admin';
+  role?: 'teacher' | 'admin' | 'master_admin';
 
   [key: string]: unknown;
 }

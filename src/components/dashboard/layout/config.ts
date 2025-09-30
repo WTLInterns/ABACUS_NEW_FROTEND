@@ -22,8 +22,16 @@ export const teacherNavItems = [
   { key: 'reports', title: 'Reports', href: paths.dashboard.reports, icon: 'file-text' },
 ] satisfies NavItemConfig[];
 
-// Admin navigation items
+// Admin navigation items (for MASTER_ADMIN)
 export const adminNavItems = [
+  { key: 'overview', title: 'Overview', href: paths.dashboard.admin, icon: 'chart-pie' },
+  { key: 'teachers', title: 'Teachers', href: paths.dashboard.teachers, icon: 'users' },
+  { key: 'students', title: 'Manage Students', href: paths.dashboard.students, icon: 'graduation-cap' },
+  { key: 'inventory', title: 'Manage Inventory', href: paths.dashboard.inventory, icon: 'package' },
+] satisfies NavItemConfig[];
+
+// Master Admin navigation items (if different from admin)
+export const masterAdminNavItems = [
   { key: 'overview', title: 'Overview', href: paths.dashboard.admin, icon: 'chart-pie' },
   { key: 'teachers', title: 'Teachers', href: paths.dashboard.teachers, icon: 'users' },
   { key: 'students', title: 'Manage Students', href: paths.dashboard.students, icon: 'graduation-cap' },
