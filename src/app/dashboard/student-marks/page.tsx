@@ -5,17 +5,17 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 
 import { config } from '@/config';
-import { StudentEnrollmentForm } from '@/components/dashboard/students';
+import { StudentMarks } from '@/components/dashboard/students/student-marks';
 
-export const metadata = { title: `Student Enrollment | Dashboard | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `Student Marks | Dashboard | ${config.site.name}` } satisfies Metadata;
 
-export default function StudentEnrollmentPage(): React.JSX.Element {
+export default function StudentMarksPage(): React.JSX.Element {
   return (
     <Box component="main" sx={{ flexGrow: 1, py: 8 }}>
       <Container maxWidth="xl">
         <Grid container spacing={3}>
           <Grid size={{ xs: 12 }}>
-            <StudentEnrollmentForm />
+            <StudentMarks />
           </Grid>
         </Grid>
       </Container>

@@ -22,9 +22,9 @@ import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 
 import { paths } from '@/paths';
-import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
-import type { SignInWithPasswordParams } from '@/lib/auth/client';
+import authService from '@/services/auth-service';
+import { clearAllClientSideData } from '@/lib/storage';
 
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
@@ -38,13 +38,11 @@ type Values = {
   accountType: 'teacher' | 'admin' | 'master_admin';
 };
 
-const defaultValues = { email: 'jawa@gmail.com', password: 'Secret1', accountType: 'master_admin' } satisfies Values;
-
 export function SignInForm(): React.JSX.Element {
   const router = useRouter();
-  const { checkSession, user } = useUser();
+  const { checkSession } = useUser();
 
-  const [showPassword, setShowPassword] = React.useState<boolean>();
+  const [showPassword, setShowPassword] = React.useState<boolean>(false);
   const [isPending, setIsPending] = React.useState<boolean>(false);
   const [notification, setNotification] = React.useState<{ open: boolean; message: string; severity: 'success' | 'error' }>({
     open: false,
@@ -56,35 +54,25 @@ export function SignInForm(): React.JSX.Element {
     control,
     handleSubmit,
     setError,
-    reset,
     formState: { errors },
-  } = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
+  } = useForm<Values>({ resolver: zodResolver(schema) });
 
-  // Reset form when user changes
+  // Clear all cookies and storage on mount to ensure fresh sign-in
   React.useEffect(() => {
-    if (!user) {
-      // Reset form to default values when user logs out
-      reset(defaultValues);
-    }
-  }, [user, reset]);
-
-  // Force reset form when component mounts (fresh login page)
-  React.useEffect(() => {
-    reset(defaultValues);
-  }, [reset]);
+    try { clearAllClientSideData(); } catch {}
+  }, []);
 
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
       setIsPending(true);
 
-      // The values object matches the SignInWithPasswordParams interface
-      const params: SignInWithPasswordParams = {
-        email: values.email,
-        password: values.password,
-        accountType: values.accountType,
-      };
+      // Choose API based on account type. Treat 'admin' same as 'master_admin'.
+      const isMasterAdmin = values.accountType === 'master_admin' || values.accountType === 'admin';
+      const loginCall = isMasterAdmin
+        ? authService.masterAdminLogin({ email: values.email, password: values.password })
+        : authService.teacherLogin({ email: values.email, password: values.password });
 
-      const { error, data } = await authClient.signInWithPassword(params);
+      const { error, data } = await loginCall;
 
       if (error) {
         // Show error notification
@@ -104,11 +92,20 @@ export function SignInForm(): React.JSX.Element {
         severity: 'success',
       });
 
-      // Refresh the auth state
+      // Optionally refresh auth state if hook supports it
       await checkSession?.();
 
-      // UserProvider, for this case, will not refresh the router
-      // After refresh, GuestGuard will handle the redirect
+      // Redirect based on role if available
+      const role = data?.role;
+      if (role === 'teacher') {
+        router.push(paths.dashboard.teacher);
+      } else if (role === 'admin' || role === 'master_admin') {
+        router.push(paths.dashboard.admin);
+      } else {
+        router.push(paths.dashboard.overview);
+      }
+
+      setIsPending(false);
       router.refresh();
     },
     [checkSession, router, setError]
@@ -134,10 +131,21 @@ export function SignInForm(): React.JSX.Element {
             render={({ field }) => (
               <FormControl error={Boolean(errors.accountType)}>
                 <InputLabel>Account Type</InputLabel>
-                <Select {...field} label="Account Type">
+                <Select
+                  label="Account Type"
+                  displayEmpty
+                  value={(field.value as string | undefined) ?? ''}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  inputRef={field.ref}
+                  name={field.name}
+                >
+                  <MenuItem value="" disabled>
+                    Select account type
+                  </MenuItem>
                   <MenuItem value="teacher">Teacher</MenuItem>
                   <MenuItem value="admin">Admin</MenuItem>
-                  <MenuItem value="master_admin">Master Admin</MenuItem>
+                  {/* <MenuItem value="master_admin">Master Admin</MenuItem> */}
                 </Select>
                 {errors.accountType ? <FormHelperText>{errors.accountType.message}</FormHelperText> : null}
               </FormControl>
@@ -149,7 +157,15 @@ export function SignInForm(): React.JSX.Element {
             render={({ field }) => (
               <FormControl error={Boolean(errors.email)}>
                 <InputLabel>Email address</InputLabel>
-                <OutlinedInput {...field} label="Email address" type="email" />
+                <OutlinedInput
+                  label="Email address"
+                  type="email"
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  inputRef={field.ref}
+                  name={field.name}
+                />
                 {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
               </FormControl>
             )}
@@ -161,7 +177,11 @@ export function SignInForm(): React.JSX.Element {
               <FormControl error={Boolean(errors.password)}>
                 <InputLabel>Password</InputLabel>
                 <OutlinedInput
-                  {...field}
+                  value={field.value ?? ''}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  inputRef={field.ref}
+                  name={field.name}
                   endAdornment={
                     showPassword ? (
                       <EyeIcon

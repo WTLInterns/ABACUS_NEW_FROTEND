@@ -25,6 +25,9 @@ import TableRow from '@mui/material/TableRow';
 import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import apiClient from '@/services/api'; // Import the API client
+import CircularProgress from '@mui/material/CircularProgress'; // Import CircularProgress for spinner
+import Swal from 'sweetalert2'; // Import SweetAlert2 for popup messages
 
 const schema = zod.object({
   firstName: zod.string().min(1, { message: 'First name is required' }),
@@ -34,7 +37,7 @@ const schema = zod.object({
   branchNames: zod.array(zod.string()).min(1, { message: 'At least one branch is required' }),
   education: zod.string().min(1, { message: 'Education is required' }),
   marksheet: zod.string().optional(),
-  role: zod.enum(['teacher', 'admin']),
+  role: zod.enum(['TEACHER']), // Changed to match backend enum
   amountPaid: zod.number().min(0, { message: 'Amount paid must be a positive number' }),
   invoice: zod.string().optional(),
   paymentType: zod.enum(['cash', 'card', 'online', 'cheque']),
@@ -50,7 +53,7 @@ const defaultValues = {
   branchNames: [''],
   education: '',
   marksheet: '',
-  role: 'teacher' as const,
+  role: 'TEACHER' as const, // Changed to match backend
   amountPaid: 0,
   invoice: '',
   paymentType: 'cash' as const,
@@ -59,12 +62,13 @@ const defaultValues = {
 export function AddTeacherForm(): React.JSX.Element {
   const [branches, setBranches] = React.useState<string[]>(['']);
   const [teachers, setTeachers] = React.useState<any[]>([]);
+  const [isSubmitting, setIsSubmitting] = React.useState(false); // State for spinner
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<Values>({ 
     defaultValues, 
     resolver: zodResolver(schema) as any // Type assertion to avoid resolver type issues
@@ -72,23 +76,113 @@ export function AddTeacherForm(): React.JSX.Element {
 
   const onSubmit = React.useCallback(
     async (data: Values): Promise<void> => {
-      // Handle form submission
-      console.log('Form values:', data);
+      // Set submitting state to show spinner
+      setIsSubmitting(true);
       
-      // Add to teachers list
-      const newTeacher = {
-        id: teachers.length + 1,
-        ...data,
-      };
-      
-      setTeachers([...teachers, newTeacher]);
-      
-      // Reset form
-      reset(defaultValues);
-      setBranches(['']);
+      try {
+        // Get masterAdminId from localStorage
+        const userData = localStorage.getItem('user-data');
+        let masterAdminId: string | null = null;
+        
+        if (userData) {
+          try {
+            const parsedUserData = JSON.parse(userData);
+            masterAdminId = parsedUserData.id;
+          } catch (parseError) {
+            console.error('Error parsing user data from localStorage:', parseError);
+          }
+        }
+        
+        if (!masterAdminId) {
+          throw new Error('Master Admin ID not found in localStorage');
+        }
+        
+        // Prepare data to match backend TeacherRequests DTO
+        const requestData = {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          password: data.password,
+          paymentType: data.paymentType,
+          branchName: branches.filter(branch => branch.trim() !== ''), // Filter out empty branches
+          paid: data.amountPaid, // Changed from amountPaid to paid to match backend
+          education: data.education,
+          markshit: data.marksheet, // Changed from marksheet to markshit to match backend
+          invoice: data.invoice,
+        };
+        
+        // Make API call to register teacher
+        const response = await apiClient.post(`/register/${masterAdminId}`, requestData);
+        
+        // Add to teachers list
+        const newTeacher = {
+          id: response.data.id,
+          ...data,
+        };
+        
+        setTeachers([...teachers, newTeacher]);
+        
+        // Show success popup
+        Swal.fire({
+          title: 'Success!',
+          text: 'Teacher added successfully!',
+          icon: 'success',
+          confirmButtonText: 'OK'
+        });
+        
+        // Reset form
+        reset(defaultValues);
+        setBranches(['']);
+      } catch (error) {
+        console.error('Error adding teacher:', error);
+        // Show error popup
+        Swal.fire({
+          title: 'Error!',
+          text: 'Failed to add teacher. Please try again.',
+          icon: 'error',
+          confirmButtonText: 'OK'
+        });
+      } finally {
+        // Reset submitting state
+        setIsSubmitting(false);
+      }
     },
-    [teachers, reset]
+    [teachers, reset, branches]
   );
+
+  React.useEffect(() => {
+    const getAllTeachers = async () => {
+      try {
+        // Get masterAdminId from localStorage
+        const userData = localStorage.getItem('user-data');
+        let masterAdminId: string | null = null;
+        
+        if (userData) {
+          try {
+            const parsedUserData = JSON.parse(userData);
+            masterAdminId = parsedUserData.id;
+          } catch (parseError) {
+            console.error('Error parsing user data from localStorage:', parseError);
+          }
+        }
+        
+        if (!masterAdminId) {
+          console.error('Master Admin ID not found in localStorage');
+          return;
+        }
+        
+        // Make API call to fetch all teachers for this master admin
+        // Using the correct endpoint from TeacherController
+        const response = await apiClient.get(`/teachers/master-admin/${masterAdminId}`);
+        setTeachers(response.data); 
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching teachers:", error);
+      }
+    };
+
+    getAllTeachers();
+  }, []);
 
   const handleAddBranch = () => {
     const newBranches = [...branches, ''];
@@ -231,9 +325,8 @@ export function AddTeacherForm(): React.JSX.Element {
                 render={({ field }) => (
                   <FormControl error={Boolean(errors.role)} fullWidth>
                     <InputLabel>Role</InputLabel>
-                    <Select {...field} label="Role" value={field.value}>
-                      <MenuItem value="teacher">Teacher</MenuItem>
-                      <MenuItem value="admin">Admin</MenuItem>
+                    <Select {...field} label="Role" value={field.value} disabled>
+                      <MenuItem value="TEACHER">Teacher</MenuItem>
                     </Select>
                     {errors.role ? <FormHelperText>{errors.role.message}</FormHelperText> : null}
                   </FormControl>
@@ -291,8 +384,14 @@ export function AddTeacherForm(): React.JSX.Element {
             </Grid>
             <Grid size={{ xs: 12 }}>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button disabled={isSubmitting} type="submit" variant="contained" onClick={handleSubmit(onSubmit)}>
-                  Add Teacher
+                <Button 
+                  disabled={isSubmitting} 
+                  type="submit" 
+                  variant="contained" 
+                  onClick={handleSubmit(onSubmit)}
+                  startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
+                >
+                  {isSubmitting ? 'Adding...' : 'Add Teacher'}
                 </Button>
               </Box>
             </Grid>
@@ -310,22 +409,22 @@ export function AddTeacherForm(): React.JSX.Element {
                 <TableHead>
                   <TableRow>
                     <TableCell>ID</TableCell>
-                    <TableCell>Name</TableCell>
+                    <TableCell>First Name</TableCell>
+                    <TableCell>Last Name</TableCell>
                     <TableCell>Email</TableCell>
                     <TableCell>Role</TableCell>
-                    <TableCell>Education</TableCell>
-                    <TableCell>Amount Paid (₹)</TableCell>
+                    <TableCell>Branch Name</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {teachers.map((teacher) => (
                     <TableRow key={teacher.id}>
                       <TableCell>{teacher.id}</TableCell>
-                      <TableCell>{teacher.firstName} {teacher.lastName}</TableCell>
+                      <TableCell>{teacher.firstName}</TableCell>
+                      <TableCell>{teacher.lastName}</TableCell>
                       <TableCell>{teacher.email}</TableCell>
                       <TableCell>{teacher.role}</TableCell>
-                      <TableCell>{teacher.education}</TableCell>
-                      <TableCell>₹{teacher.amountPaid}</TableCell>
+                      <TableCell>{teacher.branchNames}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

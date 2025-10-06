@@ -1,16 +1,13 @@
 import * as React from 'react';
 import type { Metadata } from 'next';
 import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
 
 import { config } from '@/config';
+import { CompetitionForm } from '@/components/dashboard/competition';
 
-export const metadata = { title: `Competition | Dashboard | ${config.site.name}` } satisfies Metadata;
+export const metadata = { title: `Manage Competitions | Dashboard | ${config.site.name}` } satisfies Metadata;
 
 export default function CompetitionPage(): React.JSX.Element {
   return (
@@ -18,15 +15,7 @@ export default function CompetitionPage(): React.JSX.Element {
       <Container maxWidth="xl">
         <Grid container spacing={3}>
           <Grid size={{ xs: 12 }}>
-            <Card>
-              <CardHeader title="Competition" />
-              <CardContent>
-                <Typography variant="body1">
-                  This page manages student competitions and events. Teachers can create, organize, and track student participation in various competitions.
-                </Typography>
-                {/* Add competition management components here */}
-              </CardContent>
-            </Card>
+            <CompetitionForm />
           </Grid>
         </Grid>
       </Container>

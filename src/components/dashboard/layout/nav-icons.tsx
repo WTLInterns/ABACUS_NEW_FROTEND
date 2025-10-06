@@ -13,6 +13,7 @@ import { FileTextIcon } from '@phosphor-icons/react/dist/ssr/FileText';
 import { BackpackIcon } from '@phosphor-icons/react/dist/ssr/Backpack';
 import { GraduationCapIcon } from '@phosphor-icons/react/dist/ssr/GraduationCap';
 import { PackageIcon } from '@phosphor-icons/react/dist/ssr/Package';
+import { ChartLineIcon } from '@phosphor-icons/react/dist/ssr/ChartLine';
 
 export const navIcons = {
   'chart-pie': ChartPieIcon,
@@ -29,4 +30,5 @@ export const navIcons = {
   'graduation-cap': GraduationCapIcon,
   package: PackageIcon,
   backpack: BackpackIcon,
+  'chart-line': ChartLineIcon,
 } as Record<string, Icon>;

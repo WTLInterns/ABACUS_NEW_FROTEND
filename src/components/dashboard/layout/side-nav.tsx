@@ -190,16 +190,42 @@ function renderNavItems({ items = [], pathname }: { items?: NavItemConfig[]; pat
 
 interface NavItemProps extends Omit<NavItemConfig, 'items'> {
   pathname: string;
+  items?: NavItemConfig[];
 }
 
-function NavItem({ disabled, external, href, icon, matcher, pathname, title }: NavItemProps): React.JSX.Element {
+function NavItem({ disabled, external, href, icon, matcher, pathname, title, items }: NavItemProps): React.JSX.Element {
   const active = isNavItemActive({ disabled, external, href, matcher, pathname });
   const Icon = icon ? navIcons[icon] : null;
+  const [open, setOpen] = React.useState(false);
+
+  // Check if any child item is active
+  const hasActiveChild = items?.some(item => 
+    isNavItemActive({ 
+      disabled: item.disabled, 
+      external: item.external, 
+      href: item.href, 
+      matcher: item.matcher, 
+      pathname 
+    })
+  ) || false;
+
+  // Auto open submenu if any child is active
+  React.useEffect(() => {
+    if (hasActiveChild) {
+      setOpen(true);
+    }
+  }, [hasActiveChild]);
+
+  const handleClick = () => {
+    if (items && items.length > 0) {
+      setOpen(!open);
+    }
+  };
 
   return (
     <li>
       <Box
-        {...(href
+        {...(href && !items
           ? {
               component: external ? 'a' : RouterLink,
               href,
@@ -207,6 +233,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
               rel: external ? 'noreferrer' : undefined,
             }
           : { role: 'button' })}
+        onClick={handleClick}
         sx={{
           alignItems: 'center',
           borderRadius: 1,
@@ -225,6 +252,9 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
             cursor: 'not-allowed',
           }),
           ...(active && { bgcolor: 'var(--NavItem-active-background)', color: 'var(--NavItem-active-color)' }),
+          ...(items && items.length > 0 && {
+            justifyContent: 'space-between',
+          }),
         }}
       >
         <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
@@ -244,7 +274,26 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title }: N
             {title}
           </Typography>
         </Box>
+        {items && items.length > 0 && (
+          <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
+            <CaretUpDownIcon
+              fontSize="var(--icon-fontSize-md)"
+              weight={open ? 'fill' : undefined}
+              style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}
+            />
+          </Box>
+        )}
       </Box>
+      
+      {items && items.length > 0 && (
+        <Box sx={{ 
+          pl: 2, 
+          display: open ? 'block' : 'none',
+          transition: 'all 0.3s ease'
+        }}>
+          {renderNavItems({ items, pathname })}
+        </Box>
+      )}
     </li>
   );
 }

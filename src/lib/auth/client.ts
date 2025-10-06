@@ -108,7 +108,8 @@ class AuthClientImpl implements AuthClient {
       const userData = localStorage.getItem('user-data');
       
       if (!userData) {
-        return { error: 'User not found' };
+        // No user present; return undefined data without error
+        return { data: undefined };
       }
       
       const user: User = JSON.parse(userData);

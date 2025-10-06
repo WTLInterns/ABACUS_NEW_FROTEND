@@ -24,6 +24,8 @@ import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { PencilIcon, TrashIcon } from '@phosphor-icons/react/dist/ssr';
+import { useInventory } from '@/hooks';
+import Swal from 'sweetalert2';
 
 const schema = zod.object({
   itemName: zod.string().min(1, { message: 'Item name is required' }),
@@ -39,42 +41,96 @@ const defaultValues = {
   pricePerItem: 0,
 };
 
+interface InventoryItem {
+  id: number;
+  itemName: string;
+  quantity: number;
+  pricePerItem: number;
+}
+
 export function InventoryForm(): React.JSX.Element {
   const [showForm, setShowForm] = React.useState(false);
-  const [inventoryItems, setInventoryItems] = React.useState<any[]>([]);
+  const [editingItem, setEditingItem] = React.useState<InventoryItem | null>(null);
+  const { inventoryItems, loading, fetchInventoryItems, addInventoryItem, updateInventoryItem, deleteInventoryItem } = useInventory();
 
   const {
     control,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<Values>({ defaultValues, resolver: zodResolver(schema) });
 
+  // Fetch all inventory items when component mounts
+  React.useEffect(() => {
+    fetchInventoryItems();
+  }, [fetchInventoryItems]);
+
+  // Handle edit button click
+  const handleEditClick = (item: InventoryItem) => {
+    setEditingItem(item);
+    setValue('itemName', item.itemName);
+    setValue('quantity', item.quantity);
+    setValue('pricePerItem', item.pricePerItem);
+    setShowForm(true);
+  };
+
+  // Handle delete button click
+  const handleDeleteClick = async (id: number) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you want to delete this inventory item? This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deleteInventoryItem(id);
+      } catch (error) {
+        console.error('Error deleting item:', error);
+      }
+    }
+  };
+
   const onSubmit = React.useCallback(
     async (data: Values): Promise<void> => {
-      // Handle form submission
-      console.log('Form values:', data);
-      
-      // Add to inventory items list
-      const newItem = {
-        id: inventoryItems.length + 1,
-        ...data,
-        totalValue: data.quantity * data.pricePerItem,
-      };
-      
-      setInventoryItems([...inventoryItems, newItem]);
-      
-      // Reset form and hide it
-      reset(defaultValues);
-      setShowForm(false);
+      try {
+        if (editingItem) {
+          // Update existing item
+          await updateInventoryItem(editingItem.id, {
+            itemName: data.itemName,
+            quantity: data.quantity,
+            pricePerItem: data.pricePerItem,
+          });
+        } else {
+          // Add new item
+          await addInventoryItem({
+            itemName: data.itemName,
+            quantity: data.quantity,
+            pricePerItem: data.pricePerItem,
+          });
+        }
+        
+        // Reset form and hide it
+        reset(defaultValues);
+        setEditingItem(null);
+        setShowForm(false);
+      } catch (error) {
+        // Error is already handled in the hook
+        console.error('Error in form submission:', error);
+      }
     },
-    [inventoryItems, reset]
+    [addInventoryItem, updateInventoryItem, reset, editingItem]
   );
 
   const handleToggleForm = () => {
     setShowForm(!showForm);
     if (showForm) {
       reset(defaultValues);
+      setEditingItem(null);
     }
   };
 
@@ -157,8 +213,12 @@ export function InventoryForm(): React.JSX.Element {
                   </Grid>
                 </Grid>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                  <Button disabled={isSubmitting} type="submit" variant="contained">
-                    Add Inventory Item
+                  <Button 
+                    disabled={isSubmitting} 
+                    type="submit" 
+                    variant="contained"
+                  >
+                    {isSubmitting ? (editingItem ? 'Updating...' : 'Adding...') : (editingItem ? 'Update Inventory Item' : 'Add Inventory Item')}
                   </Button>
                 </Box>
               </CardContent>
@@ -179,20 +239,35 @@ export function InventoryForm(): React.JSX.Element {
               </TableRow>
             </TableHead>
             <TableBody>
-              {inventoryItems.length > 0 ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={6} align="center">
+                    <Typography variant="body1">Loading inventory items...</Typography>
+                  </TableCell>
+                </TableRow>
+              ) : inventoryItems.length > 0 ? (
                 inventoryItems.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>{item.id}</TableCell>
                     <TableCell>{item.itemName}</TableCell>
                     <TableCell>{item.quantity}</TableCell>
-                    <TableCell>₹{item.pricePerItem.toFixed(2)}</TableCell>
-                    <TableCell>₹{item.totalValue.toFixed(2)}</TableCell>
+                    <TableCell>₹{item.pricePerItem?.toFixed(2) || '0.00'}</TableCell>
+                    <TableCell>₹{(item.quantity * (item.pricePerItem || 0)).toFixed(2)}</TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1}>
-                        <Button size="small" startIcon={<PencilIcon />}>
+                        <Button 
+                          size="small" 
+                          startIcon={<PencilIcon />} 
+                          onClick={() => handleEditClick(item)}
+                        >
                           Edit
                         </Button>
-                        <Button size="small" startIcon={<TrashIcon />} color="error">
+                        <Button 
+                          size="small" 
+                          startIcon={<TrashIcon />} 
+                          color="error"
+                          onClick={() => handleDeleteClick(item.id)}
+                        >
                           Delete
                         </Button>
                       </Stack>

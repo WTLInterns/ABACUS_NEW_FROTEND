@@ -1,5 +1,6 @@
 import apiClient from './api';
 import { User } from '@/types/user';
+import { clearAllClientSideData } from '@/lib/storage';
 
 // Define the response types
 export interface LoginResponse {
@@ -86,8 +87,7 @@ class AuthService {
    * Logout the current user
    */
   logout(): void {
-    localStorage.removeItem('custom-auth-token');
-    localStorage.removeItem('user-data');
+    try { clearAllClientSideData(); } catch {}
   }
 }
 

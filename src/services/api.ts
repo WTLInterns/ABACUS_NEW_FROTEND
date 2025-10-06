@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import { clearAllClientSideData } from '@/lib/storage';
 
 // Define the base URL for your API
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8085';
@@ -35,8 +36,7 @@ apiClient.interceptors.response.use(
     // Handle common error responses
     if (error.response?.status === 401) {
       // Unauthorized - possibly redirect to login
-      localStorage.removeItem('custom-auth-token');
-      localStorage.removeItem('user-data');
+      try { clearAllClientSideData(); } catch {}
       window.location.href = '/auth/sign-in';
     }
     
