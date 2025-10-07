@@ -24,6 +24,7 @@ import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Swal from 'sweetalert2';
 import apiClient from '@/services/api';
+import { LoadingButton } from '@/components/core/loading-button';
 
 interface Level {
   id: number;
@@ -42,6 +43,7 @@ export function ManageLevels(): React.JSX.Element {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [loading, setLoading] = React.useState(true);
   const [isAdding, setIsAdding] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const {
     control,
@@ -81,6 +83,7 @@ export function ManageLevels(): React.JSX.Element {
   };
 
   const handleCreateLevel = async (data: Values) => {
+    setIsSubmitting(true);
     try {
       // Convert name to uppercase before sending to backend
       await apiClient.post('/levels', { name: data.name.toUpperCase() });
@@ -103,6 +106,8 @@ export function ManageLevels(): React.JSX.Element {
         icon: 'error',
         confirmButtonText: 'OK'
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -152,9 +157,14 @@ export function ManageLevels(): React.JSX.Element {
                 />
                 {errors.name ? <FormHelperText>{errors.name.message}</FormHelperText> : null}
               </FormControl>
-              <Button type="submit" variant="contained">
+              <LoadingButton 
+                loading={isSubmitting} 
+                type="submit" 
+                variant="contained"
+                loadingText="Adding..."
+              >
                 Add Level
-              </Button>
+              </LoadingButton>
               <Button variant="outlined" onClick={() => setIsAdding(false)}>
                 Cancel
               </Button>

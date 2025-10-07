@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
@@ -654,18 +655,14 @@ export function RegionManagementForm(): React.JSX.Element {
                   />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <Button 
-                    disabled={isCountrySubmitting} 
+                  <LoadingButton 
+                    loading={isCountrySubmitting} 
                     type="submit" 
                     variant="contained"
+                    loadingText={editingCountry ? 'Updating...' : 'Adding...'}
                   >
-                    {isCountrySubmitting ? (
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <CircularProgress size={20} color="inherit" />
-                        <span>{editingCountry ? 'Updating...' : 'Adding...'}</span>
-                      </Stack>
-                    ) : (editingCountry ? 'Update Country' : 'Add Country')}
-                  </Button>
+                    {editingCountry ? 'Update Country' : 'Add Country'}
+                  </LoadingButton>
                   {editingCountry && (
                     <Button 
                       onClick={() => {
@@ -1057,18 +1054,14 @@ export function RegionManagementForm(): React.JSX.Element {
                   />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <Button 
-                    disabled={isTalukaSubmitting} 
+                  <LoadingButton 
+                    loading={isTalukaSubmitting} 
                     type="submit" 
                     variant="contained"
+                    loadingText={editingTaluka ? 'Updating...' : 'Adding...'}
                   >
-                    {isTalukaSubmitting ? (
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <CircularProgress size={20} color="inherit" />
-                        <span>{editingTaluka ? 'Updating...' : 'Adding...'}</span>
-                      </Stack>
-                    ) : (editingTaluka ? 'Update Taluka' : 'Add Taluka')}
-                  </Button>
+                    {editingTaluka ? 'Update Taluka' : 'Add Taluka'}
+                  </LoadingButton>
                   {editingTaluka && (
                     <Button 
                       onClick={() => {

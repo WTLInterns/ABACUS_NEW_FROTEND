@@ -26,6 +26,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { PencilIcon, TrashIcon } from '@phosphor-icons/react/dist/ssr';
 import { useInventory } from '@/hooks';
 import Swal from 'sweetalert2';
+import { LoadingButton } from '@/components/core/loading-button';
 
 const schema = zod.object({
   itemName: zod.string().min(1, { message: 'Item name is required' }),
@@ -213,13 +214,14 @@ export function InventoryForm(): React.JSX.Element {
                   </Grid>
                 </Grid>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                  <Button 
-                    disabled={isSubmitting} 
+                  <LoadingButton 
+                    loading={isSubmitting} 
                     type="submit" 
                     variant="contained"
+                    loadingText={editingItem ? 'Updating...' : 'Adding...'}
                   >
-                    {isSubmitting ? (editingItem ? 'Updating...' : 'Adding...') : (editingItem ? 'Update Inventory Item' : 'Add Inventory Item')}
-                  </Button>
+                    {editingItem ? 'Update Inventory Item' : 'Add Inventory Item'}
+                  </LoadingButton>
                 </Box>
               </CardContent>
             </Card>

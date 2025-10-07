@@ -25,12 +25,14 @@ import MenuItem from '@mui/material/MenuItem';
 import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PencilIcon, TrashIcon } from '@phosphor-icons/react/dist/ssr';
 import apiClient from '@/services/api';
 import Swal from 'sweetalert2';
-import { CustomDatePicker } from './custom-date-picker';
+import { CustomDatePicker } from '@/components/dashboard/competition/custom-date-picker';
 import dayjs, { Dayjs } from 'dayjs';
-import { RegionManagementSection } from './region-management-section';
+import { PencilIcon } from '@phosphor-icons/react/dist/ssr/Pencil';
+import { TrashIcon } from '@phosphor-icons/react/dist/ssr/Trash';
+import { LoadingButton } from '@/components/core/loading-button';
+import { RegionManagementSection } from '@/components/dashboard/competition/region-management-section';
 
 const schema = zod.object({
   competitionName: zod.string().min(1, { message: 'Competition name is required' }),
@@ -416,10 +418,11 @@ export function CompetitionForm(): React.JSX.Element {
                     </Grid>
                   </Grid>
                   <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-                    <Button 
-                      disabled={isSubmitting} 
+                    <LoadingButton 
+                      loading={isSubmitting} 
                       type="submit" 
                       variant="contained"
+                      loadingText={editingItem ? 'Updating...' : 'Adding...'}
                       sx={{ 
                         px: 4, 
                         py: 1.5, 
@@ -430,8 +433,8 @@ export function CompetitionForm(): React.JSX.Element {
                         }
                       }}
                     >
-                      {isSubmitting ? (editingItem ? 'Updating...' : 'Adding...') : (editingItem ? 'Update Competition' : 'Add Competition')}
-                    </Button>
+                      {editingItem ? 'Update Competition' : 'Add Competition'}
+                    </LoadingButton>
                   </Box>
                 </CardContent>
               </Card>

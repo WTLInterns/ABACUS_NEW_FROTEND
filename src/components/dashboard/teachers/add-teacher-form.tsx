@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
@@ -11,23 +10,23 @@ import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import Select from '@mui/material/Select';
-import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import apiClient from '@/services/api'; // Import the API client
-import CircularProgress from '@mui/material/CircularProgress'; // Import CircularProgress for spinner
-import Swal from 'sweetalert2'; // Import SweetAlert2 for popup messages
+import apiClient from '@/services/api';
+import Swal from 'sweetalert2';
+import { LoadingButton } from '@/components/core/loading-button';
+import { Button, Stack } from '@mui/material';
 
 const schema = zod.object({
   firstName: zod.string().min(1, { message: 'First name is required' }),
@@ -384,15 +383,15 @@ export function AddTeacherForm(): React.JSX.Element {
             </Grid>
             <Grid size={{ xs: 12 }}>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button 
-                  disabled={isSubmitting} 
+                <LoadingButton 
+                  loading={isSubmitting} 
                   type="submit" 
                   variant="contained" 
                   onClick={handleSubmit(onSubmit)}
-                  startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : null}
+                  loadingText="Adding..."
                 >
-                  {isSubmitting ? 'Adding...' : 'Add Teacher'}
-                </Button>
+                  Add Teacher
+                </LoadingButton>
               </Box>
             </Grid>
           </Grid>

@@ -25,6 +25,7 @@ import { CustomDatePicker } from '@/components/dashboard/competition/custom-date
 import dayjs, { Dayjs } from 'dayjs';
 import eventEmitter from '@/lib/events';
 import { LoadingButton } from '@/components/core/loading-button';
+import { CircularProgress } from '@mui/material';
 
 // Define types for region entities
 interface Country {

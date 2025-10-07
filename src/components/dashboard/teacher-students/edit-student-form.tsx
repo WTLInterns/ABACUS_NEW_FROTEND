@@ -13,18 +13,20 @@ import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import Typography from '@mui/material/Typography';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import CircularProgress from '@mui/material/CircularProgress';
-import Typography from '@mui/material/Typography';
 import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Swal from 'sweetalert2';
 import apiClient from '@/services/api';
+import Swal from 'sweetalert2';
 import { CustomDatePicker } from '@/components/dashboard/competition/custom-date-picker';
 import dayjs, { Dayjs } from 'dayjs';
 import eventEmitter from '@/lib/events';
+import { LoadingButton } from '@/components/core/loading-button';
 
 // Define the student type
 interface Student {
@@ -781,13 +783,14 @@ export function EditStudentForm({ student, onCancel, onSuccess }: EditStudentFor
                 >
                   Cancel
                 </Button>
-                <Button 
-                  disabled={isSubmitting} 
-                  type="submit" 
+                <LoadingButton
+                  loading={isSubmitting}
+                  type="submit"
                   variant="contained"
-                  sx={{ 
-                    px: 4, 
-                    py: 1.5, 
+                  loadingText="Updating..."
+                  sx={{
+                    px: 4,
+                    py: 1.5,
                     borderRadius: 2,
                     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                     '&:hover': {
@@ -795,13 +798,8 @@ export function EditStudentForm({ student, onCancel, onSuccess }: EditStudentFor
                     }
                   }}
                 >
-                  {isSubmitting ? (
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <CircularProgress size={20} color="inherit" />
-                      <span>Updating...</span>
-                    </Stack>
-                  ) : 'Update Student'}
-                </Button>
+                  Update Student
+                </LoadingButton>
               </Box>
             </Grid>
           </Grid>
