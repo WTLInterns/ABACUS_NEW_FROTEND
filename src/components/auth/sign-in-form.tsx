@@ -132,20 +132,16 @@ export function SignInForm(): React.JSX.Element {
               <FormControl error={Boolean(errors.accountType)}>
                 <InputLabel>Account Type</InputLabel>
                 <Select
-                  label="Account Type"
+                  label=""
                   displayEmpty
                   value={(field.value as string | undefined) ?? ''}
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                   inputRef={field.ref}
                   name={field.name}
-                >
-                  <MenuItem value="" disabled>
-                    Select account type
-                  </MenuItem>
+                >                 
                   <MenuItem value="teacher">Teacher</MenuItem>
                   <MenuItem value="admin">Admin</MenuItem>
-                  {/* <MenuItem value="master_admin">Master Admin</MenuItem> */}
                 </Select>
                 {errors.accountType ? <FormHelperText>{errors.accountType.message}</FormHelperText> : null}
               </FormControl>

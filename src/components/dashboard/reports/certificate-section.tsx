@@ -238,7 +238,7 @@ Technical details: ${err.message}`,
             </Stack>
           </Box>
           
-          {/* Certificate Preview */}
+           {/* Certificate Preview */}
           <Box sx={{ overflow: 'auto', maxHeight: '600px' }}>
             <div 
               ref={certificateRef}
@@ -257,10 +257,10 @@ Technical details: ${err.message}`,
               <div
                 style={{
                   position: 'absolute',
-                  top: '57%',
+                  top: '56%',
                   left: '50%',
                   transform: 'translate(-50%, -50%)',
-                  fontSize: '2rem',
+                  fontSize: '20px',
                   fontWeight: 'bold',
                   color: '#630000',
                   fontFamily: 'serif',
@@ -274,10 +274,10 @@ Technical details: ${err.message}`,
               <div
                 style={{
                   position: 'absolute',
-                  top: '74%',
-                  left: '28%',
+                  top: '73%',
+                  left: '40%',
                   transform: 'translateX(-50%)',
-                  fontSize: '2rem',
+                  fontSize: '20px',
                   fontWeight: 'bold',
                   color: '#630000',
                   fontFamily: 'serif',
@@ -291,10 +291,10 @@ Technical details: ${err.message}`,
               <div
                 style={{
                   position: 'absolute',
-                  top: '74%',
-                  left: '72%',
+                  top: '61.4%',
+                  left: '51.2%',
                   transform: 'translateX(-50%)',
-                  fontSize: '2rem',
+                  fontSize: '5px',
                   fontWeight: 'bold',
                   color: '#630000',
                   fontFamily: 'serif',
@@ -310,9 +310,9 @@ Technical details: ${err.message}`,
                 alt="Director's Signature"
                 style={{
                   position: 'absolute',
-                  top: '81%',
-                  right: '30%',
-                  width: '150px',
+                  top: '79%',
+                  right: '44%',
+                  width: '80px',
                   height: 'auto',
                   background: 'transparent'
                 }}
