@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
@@ -14,6 +13,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 
 import { authClient } from '@/lib/auth/client';
+import { LoadingButton } from '@/components/core/loading-button';
 
 const schema = zod.object({ email: zod.string().min(1, { message: 'Email is required' }).email() });
 
@@ -67,9 +67,9 @@ export function ResetPasswordForm(): React.JSX.Element {
             )}
           />
           {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
-          <Button disabled={isPending} type="submit" variant="contained">
+          <LoadingButton loading={isPending} type="submit" variant="contained" loadingText="Sending recovery link...">
             Send recovery link
-          </Button>
+          </LoadingButton>
         </Stack>
       </form>
     </Stack>

@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
@@ -28,6 +27,7 @@ import { z as zod } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import apiClient from '@/services/api';
 import Swal from 'sweetalert2';
+import { LoadingButton } from '@/components/core/loading-button';
 
 // Define types for our region entities (updated to match DTOs)
 interface Country {
@@ -788,18 +788,14 @@ export function RegionManagementForm(): React.JSX.Element {
                   />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <Button 
-                    disabled={isStateSubmitting} 
+                  <LoadingButton 
+                    loading={isStateSubmitting} 
                     type="submit" 
                     variant="contained"
+                    loadingText={editingState ? 'Updating...' : 'Adding...'}
                   >
-                    {isStateSubmitting ? (
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <CircularProgress size={20} color="inherit" />
-                        <span>{editingState ? 'Updating...' : 'Adding...'}</span>
-                      </Stack>
-                    ) : (editingState ? 'Update State' : 'Add State')}
-                  </Button>
+                    {editingState ? 'Update State' : 'Add State'}
+                  </LoadingButton>
                   {editingState && (
                     <Button 
                       onClick={() => {
@@ -812,6 +808,7 @@ export function RegionManagementForm(): React.JSX.Element {
                       Cancel
                     </Button>
                   )}
+
                 </Grid>
               </Grid>
             </form>
@@ -926,18 +923,14 @@ export function RegionManagementForm(): React.JSX.Element {
                   />
                 </Grid>
                 <Grid size={{ xs: 12 }}>
-                  <Button 
-                    disabled={isDistrictSubmitting} 
+                  <LoadingButton 
+                    loading={isDistrictSubmitting} 
                     type="submit" 
                     variant="contained"
+                    loadingText={editingDistrict ? 'Updating...' : 'Adding...'}
                   >
-                    {isDistrictSubmitting ? (
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <CircularProgress size={20} color="inherit" />
-                        <span>{editingDistrict ? 'Updating...' : 'Adding...'}</span>
-                      </Stack>
-                    ) : (editingDistrict ? 'Update District' : 'Add District')}
-                  </Button>
+                    {editingDistrict ? 'Update District' : 'Add District'}
+                  </LoadingButton>
                   {editingDistrict && (
                     <Button 
                       onClick={() => {

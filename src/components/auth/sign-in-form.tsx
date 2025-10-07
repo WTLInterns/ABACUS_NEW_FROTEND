@@ -5,7 +5,6 @@ import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
@@ -25,6 +24,7 @@ import { paths } from '@/paths';
 import { useUser } from '@/hooks/use-user';
 import authService from '@/services/auth-service';
 import { clearAllClientSideData } from '@/lib/storage';
+import { LoadingButton } from '@/components/core/loading-button';
 
 const schema = zod.object({
   email: zod.string().min(1, { message: 'Email is required' }).email(),
@@ -210,9 +210,9 @@ export function SignInForm(): React.JSX.Element {
             </Link>
           </div>
           {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
-          <Button disabled={isPending} type="submit" variant="contained">
+          <LoadingButton loading={isPending} type="submit" variant="contained" loadingText="Signing in...">
             Sign in
-          </Button>
+          </LoadingButton>
         </Stack>
       </form>
       <Snackbar

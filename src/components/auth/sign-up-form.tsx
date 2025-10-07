@@ -5,7 +5,6 @@ import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Alert from '@mui/material/Alert';
-import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -21,6 +20,7 @@ import { z as zod } from 'zod';
 import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
+import { LoadingButton } from '@/components/core/loading-button';
 
 const schema = zod.object({
   firstName: zod.string().min(1, { message: 'First name is required' }),
@@ -145,9 +145,9 @@ export function SignUpForm(): React.JSX.Element {
             )}
           />
           {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
-          <Button disabled={isPending} type="submit" variant="contained">
+          <LoadingButton loading={isPending} type="submit" variant="contained" loadingText="Signing up...">
             Sign up
-          </Button>
+          </LoadingButton>
         </Stack>
       </form>
       <Alert color="warning">Created users are not persisted</Alert>
