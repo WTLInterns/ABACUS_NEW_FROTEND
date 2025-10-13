@@ -69,6 +69,7 @@ export function CertificateSection(): React.JSX.Element {
   const [loadingStates, setLoadingStates] = React.useState<boolean>(false);
   const [loadingStudents, setLoadingStudents] = React.useState<boolean>(false);
   const [loadingLevelMarks, setLoadingLevelMarks] = React.useState<boolean>(false);
+  const [levelLeftPosition, setLevelLeftPosition] = React.useState<number>(58);
   const certificateRef = React.useRef<HTMLDivElement>(null);
 
   // Fetch countries on component mount
@@ -522,6 +523,22 @@ Technical details: ${err.message}`,
             </Stack>
           </Box>
           
+          {/* Position Adjustment Controls */}
+          <Box>
+            <Typography variant="h6" sx={{ mb: 2 }}>Adjust Level Position</Typography>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+              <TextField
+                label="Level Left Position (%)"
+                type="number"
+                value={levelLeftPosition}
+                onChange={(e) => setLevelLeftPosition(Number(e.target.value))}
+                inputProps={{ min: 0, max: 100, step: 0.1 }}
+                helperText="Adjust the horizontal position of the level text (0-100%)"
+                sx={{ width: { xs: '100%', sm: '300px' } }}
+              />
+            </Stack>
+          </Box>
+          
           {/* Download Buttons */}
           <Box>
             <Stack direction="row" spacing={2}>
@@ -631,7 +648,7 @@ Technical details: ${err.message}`,
                 style={{
                   position: 'absolute',
                   top: '62%',
-                  left: '58%',
+                  left: `${levelLeftPosition}%`,
                   transform: 'translate(-50%, -50%)',
                   fontSize: '9px',
                   fontWeight: 'bold',

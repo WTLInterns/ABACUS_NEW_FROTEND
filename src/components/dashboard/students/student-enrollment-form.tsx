@@ -202,10 +202,13 @@ export function StudentEnrollmentForm(): React.JSX.Element {
       setStates([]);
       setDistricts([]);
       setTalukas([]);
-      reset({
-        ...defaultValues,
-        country: selectedCountry
-      });
+      // Instead of resetting the entire form, only reset dependent fields
+      reset((formValues) => ({
+        ...formValues,
+        state: '',
+        district: '',
+        taluka: ''
+      }));
     }
   }, [selectedCountry]);
 
@@ -216,11 +219,12 @@ export function StudentEnrollmentForm(): React.JSX.Element {
       // Reset dependent fields
       setDistricts([]);
       setTalukas([]);
-      reset({
-        ...defaultValues,
-        country: selectedCountry,
-        state: selectedState
-      });
+      // Instead of resetting the entire form, only reset dependent fields
+      reset((formValues) => ({
+        ...formValues,
+        district: '',
+        taluka: ''
+      }));
     }
   }, [selectedState]);
 
@@ -230,12 +234,11 @@ export function StudentEnrollmentForm(): React.JSX.Element {
       fetchTalukasByName(selectedDistrict);
       // Reset dependent field
       setTalukas([]);
-      reset({
-        ...defaultValues,
-        country: selectedCountry,
-        state: selectedState,
-        district: selectedDistrict
-      });
+      // Instead of resetting the entire form, only reset dependent fields
+      reset((formValues) => ({
+        ...formValues,
+        taluka: ''
+      }));
     }
   }, [selectedDistrict]);
 
@@ -474,7 +477,7 @@ export function StudentEnrollmentForm(): React.JSX.Element {
                       value={field.value || ''}
                     >
                       <MenuItem value="ABACUS">ABACUS</MenuItem>
-                      <MenuItem value="VEDIC MATH">VEDIC MATH</MenuItem>
+                      <MenuItem value="VEDIC-MATH">VEDIC MATH</MenuItem>
                     </Select>
                     {errors.enrollMeantType ? <FormHelperText>{errors.enrollMeantType.message}</FormHelperText> : null}
                   </FormControl>

@@ -1,0 +1,1 @@
+export { AssignCompetitionForm } from './assign-competition-form';

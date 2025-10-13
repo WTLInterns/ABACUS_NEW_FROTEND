@@ -15,6 +15,7 @@ import { SunIcon } from '@phosphor-icons/react/dist/ssr/Sun';
 import { usePopover } from '@/hooks/use-popover';
 import { useUser } from '@/hooks/use-user';
 import { useTheme } from '@/contexts/theme-context';
+import { DynamicLogo } from '@/components/core/logo';
 
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
@@ -57,6 +58,10 @@ export function MainNav(): React.JSX.Element {
             >
               <ListIcon />
             </IconButton>
+            {/* Logo added here */}
+            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+              <DynamicLogo height={40} width={120} />
+            </Box>
             <Tooltip title="Search">
               <IconButton>
                 <MagnifyingGlassIcon />

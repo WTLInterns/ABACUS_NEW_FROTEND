@@ -38,14 +38,14 @@ export function TotalCustomers({ diff, trend, sx, value }: TotalCustomersProps):
           {diff ? (
             <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
               <Stack sx={{ alignItems: 'center' }} direction="row" spacing={0.5}>
-                <TrendIcon color={trendColor} fontSize="var(--icon-fontSize-md)" />
-                <Typography color={trendColor} variant="body2">
+                {/* <TrendIcon color={trendColor} fontSize="var(--icon-fontSize-md)" /> */}
+                {/* <Typography color={trendColor} variant="body2">
                   {diff}%
-                </Typography>
+                </Typography> */}
               </Stack>
-              <Typography color="text.secondary" variant="caption">
+              {/* <Typography color="text.secondary" variant="caption">
                 Since last month
-              </Typography>
+              </Typography> */}
             </Stack>
           ) : null}
         </Stack>

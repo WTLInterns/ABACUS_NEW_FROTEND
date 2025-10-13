@@ -21,13 +21,15 @@ export const teacherNavItems = [
   { key: 'marks-entry', title: 'Student Marks Entry', href: paths.dashboard.marksEntry, icon: 'pencil' },
   { key: 'student-marks', title: 'Student Marks', href: paths.dashboard.studentMarks, icon: 'chart-line' },
   { key: 'competition', title: 'Competition', href: paths.dashboard.competition, icon: 'trophy' },
+  { key: 'assign-competition', title: 'Assign Competition', href: paths.dashboard.assignCompetition, icon: 'users' },
   { 
     key: 'reports', 
     title: 'Reports', 
     href: paths.dashboard.reports, 
     icon: 'file-text',
     items: [
-      { key: 'certificate', title: 'Certificate', href: paths.dashboard.reports + '/certificate' }
+      { key: 'certificate', title: 'Certificate', href: paths.dashboard.reports + '/certificate' },
+      { key: 'ledger', title: 'Ledger Report', href: paths.dashboard.ledgerReport }
     ]
   },
 ] satisfies NavItemConfig[];

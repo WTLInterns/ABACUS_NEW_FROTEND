@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import RouterLink from 'next/link';
 import Box from '@mui/material/Box';
@@ -5,6 +7,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
 import { paths } from '@/paths';
+import { DynamicLogo } from '@/components/core/logo';
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -30,12 +33,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
         }}
       >
         <Stack spacing={3}>
-          <Box
-            component="img"
-            alt="Abacus Logo"
-            src="/assets/abacusLogo.png"
-            sx={{ height: 'auto', width: '100%', maxWidth: '400px' }}
-          />
+          <DynamicLogo height={120} width={120} />
         </Stack>
       </Box>
       <Box sx={{ display: 'flex', flex: '1 1 auto', flexDirection: 'column' }}>

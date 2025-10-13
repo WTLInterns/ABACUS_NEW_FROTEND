@@ -17,7 +17,9 @@ export const paths = {
     marksEntry: '/dashboard/marks-entry',
     studentMarks: '/dashboard/student-marks',
     competition: '/dashboard/competition',
+    assignCompetition: '/dashboard/assign-competition',
     reports: '/dashboard/reports',
+    ledgerReport: '/dashboard/reports/ledger',
     // Admin specific paths
     teachers: '/dashboard/teachers',
     adminStudents: '/dashboard/admin/students',

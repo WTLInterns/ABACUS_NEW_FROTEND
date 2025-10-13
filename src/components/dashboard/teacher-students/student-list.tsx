@@ -18,6 +18,10 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
 import { PencilIcon, TrashIcon, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr';
 import Swal from 'sweetalert2';
 import apiClient from '@/services/api';
@@ -52,6 +56,18 @@ interface Student {
   status: string;
 }
 
+// Define the competition type
+interface Competition {
+  id: number;
+  competitionName: string;
+  heading: string;
+  description: string;
+  registrationLastDate: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+}
+
 interface UserData {
   id: string;
   firstName: string;
@@ -69,7 +85,9 @@ export function StudentList(): React.JSX.Element {
   const [loading, setLoading] = React.useState(true);
   const [editingStudent, setEditingStudent] = React.useState<Student | null>(null);
   const [searchTerm, setSearchTerm] = React.useState('');
-  const [statusFilter, setStatusFilter] = React.useState<'ALL' | 'PENDING' | 'APPROVED'>('ALL');
+  const [statusFilter, setStatusFilter] = React.useState<'ALL' | 'PENDING' | 'APPROVED'>('APPROVED'); // Changed default to APPROVED
+  const [competitions, setCompetitions] = React.useState<Competition[]>([]);
+  const [selectedCompetition, setSelectedCompetition] = React.useState<{[key: number]: number | null}>({});
 
   // Get teacher ID from localStorage on component mount
   React.useEffect(() => {
@@ -80,8 +98,11 @@ export function StudentList(): React.JSX.Element {
         const id = parseInt(userData.id, 10);
         setTeacherId(id);
         
-        // Fetch students for this teacher
+        // Fetch students for this teacher (only approved by default)
         fetchStudents(id);
+        
+        // Fetch all competitions
+        fetchCompetitions();
       } catch (error) {
         console.error('Error parsing user data from localStorage:', error);
         Swal.fire({
@@ -151,7 +172,12 @@ export function StudentList(): React.JSX.Element {
   const fetchStudents = async (id: number) => {
     setLoading(true);
     try {
-      const response = await apiClient.get<Student[]>(`/students/teacher/${id}`);
+      // Fetch only approved students by default
+      const endpoint = statusFilter === 'APPROVED' 
+        ? `/students/teacher/${id}/approved`
+        : `/students/teacher/${id}`;
+      
+      const response = await apiClient.get<Student[]>(endpoint);
       setStudents(response.data);
     } catch (error) {
       console.error('Error fetching students:', error);
@@ -163,6 +189,21 @@ export function StudentList(): React.JSX.Element {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCompetitions = async () => {
+    try {
+      const response = await apiClient.get<Competition[]>('/competition/getAllCompetition');
+      setCompetitions(response.data);
+    } catch (error) {
+      console.error('Error fetching competitions:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to fetch competitions. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     }
   };
 
@@ -225,6 +266,47 @@ export function StudentList(): React.JSX.Element {
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  // Handle competition selection for a student
+  const handleCompetitionChange = (studentId: number, competitionId: number) => {
+    setSelectedCompetition(prev => ({
+      ...prev,
+      [studentId]: competitionId
+    }));
+  };
+
+  // Assign competition to student
+  const handleAssignCompetition = async (studentId: number) => {
+    const competitionId = selectedCompetition[studentId];
+    
+    if (!competitionId) {
+      Swal.fire({
+        title: 'Error!',
+        text: 'Please select a competition first.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+
+    try {
+      await apiClient.put(`/competition/${studentId}/${competitionId}/assign`);
+      Swal.fire({
+        title: 'Success!',
+        text: 'Competition assigned to student successfully.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+      });
+    } catch (error) {
+      console.error('Error assigning competition:', error);
+      Swal.fire({
+        title: 'Error!',
+        text: 'Failed to assign competition. Please try again.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+    }
   };
 
   // Avoid a layout jump when reaching the last page with empty rows.
@@ -312,6 +394,7 @@ export function StudentList(): React.JSX.Element {
                 <TableCell>Center</TableCell>
                 <TableCell>Contact</TableCell>
                 <TableCell>Status</TableCell>
+                <TableCell>Assign Competition</TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -350,6 +433,35 @@ export function StudentList(): React.JSX.Element {
                       </Typography>
                     </TableCell>
                     <TableCell>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <FormControl size="small" sx={{ minWidth: 120 }}>
+                          <InputLabel id={`competition-label-${student.id}`}>Competition</InputLabel>
+                          <Select
+                            labelId={`competition-label-${student.id}`}
+                            value={selectedCompetition[student.id] || ''}
+                            label="Competition"
+                            onChange={(e) => handleCompetitionChange(student.id, Number(e.target.value))}
+                          >
+                            <MenuItem value="">
+                              <em>Select Competition</em>
+                            </MenuItem>
+                            {competitions.map((competition) => (
+                              <MenuItem key={competition.id} value={competition.id}>
+                                {competition.competitionName}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                        <Button 
+                          variant="contained" 
+                          size="small"
+                          onClick={() => handleAssignCompetition(student.id)}
+                        >
+                          Assign
+                        </Button>
+                      </Stack>
+                    </TableCell>
+                    <TableCell>
                       <Stack direction="row" spacing={1}>
                         <IconButton 
                           color="primary" 
@@ -370,7 +482,7 @@ export function StudentList(): React.JSX.Element {
               })}
               {emptyRows > 0 && (
                 <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={8} />
+                  <TableCell colSpan={9} />
                 </TableRow>
               )}
             </TableBody>
