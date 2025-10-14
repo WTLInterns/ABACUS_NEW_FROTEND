@@ -95,7 +95,7 @@ export function StudentList(): React.JSX.Element {
     if (userDataString) {
       try {
         const userData: UserData = JSON.parse(userDataString);
-        const id = parseInt(userData.id, 10);
+        const id = Number.parseInt(userData.id, 10);
         setTeacherId(id);
         
         // Fetch students for this teacher (only approved by default)
@@ -264,7 +264,7 @@ export function StudentList(): React.JSX.Element {
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(Number.parseInt(event.target.value, 10));
     setPage(0);
   };
 

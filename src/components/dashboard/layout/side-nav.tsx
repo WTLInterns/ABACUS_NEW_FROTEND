@@ -39,14 +39,18 @@ export function SideNav(): React.JSX.Element {
     if (!user) return navItems;
     
     switch (user.role) {
-      case 'teacher':
+      case 'teacher': {
         return teacherNavItems;
-      case 'admin':
+      }
+      case 'admin': {
         return adminNavItems;
-      case 'master_admin':
+      }
+      case 'master_admin': {
         return masterAdminNavItems;
-      default:
+      }
+      default: {
         return navItems;
+      }
     }
   }, [user]);
 
@@ -68,7 +72,7 @@ export function SideNav(): React.JSX.Element {
       await checkSession?.();
 
       // Force a full page reload to ensure clean state
-      window.location.href = paths.auth.signIn;
+      globalThis.location.href = paths.auth.signIn;
     } catch (error) {
       logger.error('Sign out error', error);
     }

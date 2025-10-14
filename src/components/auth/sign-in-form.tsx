@@ -59,7 +59,11 @@ export function SignInForm(): React.JSX.Element {
 
   // Clear all cookies and storage on mount to ensure fresh sign-in
   React.useEffect(() => {
-    try { clearAllClientSideData(); } catch {}
+    try { 
+      clearAllClientSideData(); 
+    } catch {
+      // Ignore errors during cleanup
+    }
   }, []);
 
   const onSubmit = React.useCallback(
@@ -108,7 +112,7 @@ export function SignInForm(): React.JSX.Element {
       setIsPending(false);
       router.refresh();
     },
-    [checkSession, router, setError]
+    [checkSession, router]
   );
 
   const handleCloseNotification = () => {

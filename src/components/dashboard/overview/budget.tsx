@@ -17,8 +17,6 @@ export interface BudgetProps {
 }
 
 export function Budget({ diff, trend, sx, value }: BudgetProps): React.JSX.Element {
-  const TrendIcon = trend === 'up' ? ArrowUpIcon : ArrowDownIcon;
-  const trendColor = trend === 'up' ? 'var(--mui-palette-success-main)' : 'var(--mui-palette-error-main)';
 
   return (
     <Card sx={sx}>

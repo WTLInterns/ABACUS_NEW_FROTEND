@@ -39,7 +39,7 @@ export default function Page(): React.JSX.Element {
         const userDataString = localStorage.getItem('user-data');
         if (userDataString) {
           const userData = JSON.parse(userDataString);
-          const masterAdminId = parseInt(userData.id, 10);
+          const masterAdminId = Number.parseInt(userData.id, 10);
           
           // Fetch teacher count
           const teacherResponse = await apiClient.get(`/dashboard/teacherCount/${masterAdminId}`);

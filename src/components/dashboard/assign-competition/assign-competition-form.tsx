@@ -66,7 +66,7 @@ export function AssignCompetitionForm(): React.JSX.Element {
     if (userDataString) {
       try {
         const userData = JSON.parse(userDataString);
-        const id = parseInt(userData.id, 10);
+        const id = Number.parseInt(userData.id, 10);
         setTeacherId(id);
         fetchStudents(id);
         fetchCompetitions();

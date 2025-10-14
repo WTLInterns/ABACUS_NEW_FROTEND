@@ -9,28 +9,24 @@ import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { ListIcon } from '@phosphor-icons/react/dist/ssr/List';
 import { MagnifyingGlassIcon } from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
-import { MoonIcon } from '@phosphor-icons/react/dist/ssr/Moon';
-import { SunIcon } from '@phosphor-icons/react/dist/ssr/Sun';
 
 import { usePopover } from '@/hooks/use-popover';
 import { useUser } from '@/hooks/use-user';
-import { useTheme } from '@/contexts/theme-context';
 import { DynamicLogo } from '@/components/core/logo';
 
 import { MobileNav } from './mobile-nav';
 import { UserPopover } from './user-popover';
 
+// Capitalize first letter of role
+const capitalizeRole = (role: string) => {
+  return role.charAt(0).toUpperCase() + role.slice(1);
+};
+
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
   const { user } = useUser();
-  const { mode, toggleMode } = useTheme();
 
   const userPopover = usePopover<HTMLDivElement>();
-
-  // Capitalize first letter of role
-  const capitalizeRole = (role: string) => {
-    return role.charAt(0).toUpperCase() + role.slice(1);
-  };
 
   return (
     <React.Fragment>

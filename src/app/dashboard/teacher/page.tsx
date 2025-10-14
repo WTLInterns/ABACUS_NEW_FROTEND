@@ -13,36 +13,28 @@ import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
 import { CheckCircle as CheckCircleIcon } from '@phosphor-icons/react/dist/ssr/CheckCircle';
 import { Book as BookIcon } from '@phosphor-icons/react/dist/ssr/Book';
 import { CurrencyInr as CurrencyIcon } from '@phosphor-icons/react/dist/ssr/CurrencyInr';
-import { GraduationCap as LevelIcon } from '@phosphor-icons/react/dist/ssr/GraduationCap';
 
-import { Budget } from '@/components/dashboard/overview/budget';
-import { TasksProgress } from '@/components/dashboard/overview/tasks-progress';
-import { TotalCustomers } from '@/components/dashboard/overview/total-customers';
-import { TotalProfit } from '@/components/dashboard/overview/total-profit';
-import { StudentEnrollmentData } from '@/components/dashboard/overview/student-enrollment-data';
-// import { StudentLevels } from '@/components/dashboard/overview/student-levels';
+import { StudentEnrollmentData, type Student } from '@/components/dashboard/overview/student-enrollment-data';
 import apiClient from '@/services/api';
 
 export default function TeacherOverviewPage(): React.JSX.Element {
-  const [abacusStudents, setAbacusStudents] = React.useState<any[]>([]);
-  const [vedicMathStudents, setVedicMathStudents] = React.useState<any[]>([]);
+  const [abacusStudents, setAbacusStudents] = React.useState<Student[]>([]);
+  const [vedicMathStudents, setVedicMathStudents] = React.useState<Student[]>([]);
   const [totalStudents, setTotalStudents] = React.useState<string>('0');
   const [enrollmentCount, setEnrollmentCount] = React.useState<string>('0');
   const [enrollmentType, setEnrollmentType] = React.useState<'ABACUS' | 'VEDIC-MATH'>('ABACUS');
   const [statusCount, setStatusCount] = React.useState<string>('0');
   const [statusType, setStatusType] = React.useState<'APPROVED' | 'PENDING'>('APPROVED');
   const [outstandingPrice, setOutstandingPrice] = React.useState<string>('0');
-  const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        setLoading(true);
         // Get teacher ID from localStorage
         const userDataString = localStorage.getItem('user-data');
         if (userDataString) {
           const userData = JSON.parse(userDataString);
-          const teacherId = parseInt(userData.id, 10);
+          const teacherId = Number.parseInt(userData.id, 10);
           
           // Fetch total student count
           const countResponse = await apiClient.get(`/dashboard/studentcount/${teacherId}`);
@@ -70,8 +62,6 @@ export default function TeacherOverviewPage(): React.JSX.Element {
         }
       } catch (error) {
         console.error('Error fetching dashboard data:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -226,18 +216,6 @@ export default function TeacherOverviewPage(): React.JSX.Element {
           sx={{ height: '100%' }}
         />
       </Grid>
-      {/* <Grid
-        size={{
-          xs: 12,
-        }}
-      >
-        <StudentLevels
-          students={enrollmentType === 'ABACUS' ? abacusStudents : vedicMathStudents}
-          enrollmentType={enrollmentType}
-          onToggleEnrollment={handleToggleEnrollment}
-          sx={{ height: '100%' }}
-        />
-      </Grid> */}
     </Grid>
   );
 }

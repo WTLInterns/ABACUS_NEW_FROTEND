@@ -178,25 +178,25 @@ export function CompetitionForm(): React.JSX.Element {
   const validateDates = () => {
     let isValid = true;
     
-    if (!registrationLastDate) {
+    if (registrationLastDate) {
+      setRegistrationLastDateError(undefined);
+    } else {
       setRegistrationLastDateError('Registration last date is required');
       isValid = false;
-    } else {
-      setRegistrationLastDateError(undefined);
     }
     
-    if (!startDate) {
+    if (startDate) {
+      setStartDateError(undefined);
+    } else {
       setStartDateError('Start date is required');
       isValid = false;
-    } else {
-      setStartDateError(undefined);
     }
     
-    if (!endDate) {
+    if (endDate) {
+      setEndDateError(undefined);
+    } else {
       setEndDateError('End date is required');
       isValid = false;
-    } else {
-      setEndDateError(undefined);
     }
     
     return isValid;
@@ -213,9 +213,9 @@ export function CompetitionForm(): React.JSX.Element {
         // Add date values to the data
         const submissionData = {
           ...data,
-          registrationLastDate: registrationLastDate ? registrationLastDate.format('YYYY-MM-DD') : '',
-          startDate: startDate ? startDate.format('YYYY-MM-DD') : '',
-          endDate: endDate ? endDate.format('YYYY-MM-DD') : '',
+          registrationLastDate: registrationLastDate?.format('YYYY-MM-DD') ?? '',
+          startDate: startDate?.format('YYYY-MM-DD') ?? '',
+          endDate: endDate?.format('YYYY-MM-DD') ?? '',
         };
         
         if (editingItem) {
@@ -270,7 +270,7 @@ export function CompetitionForm(): React.JSX.Element {
         });
       }
     },
-    [reset, editingItem, registrationLastDate, startDate, endDate]
+    [reset, editingItem, registrationLastDate, startDate, endDate, validateDates]
   );
 
   const handleToggleForm = () => {
@@ -475,7 +475,7 @@ export function CompetitionForm(): React.JSX.Element {
                       <TableCell>{item.id}</TableCell>
                       <TableCell>{item.competitionName}</TableCell>
                       <TableCell>{item.heading}</TableCell>
-                      <TableCell>{item.description.substring(0, 50)}{item.description.length > 50 ? '...' : ''}</TableCell>
+                      <TableCell>{item.description.slice(0, 50)}{item.description.length > 50 ? '...' : ''}</TableCell>
                       <TableCell>{item.registrationLastDate}</TableCell>
                       <TableCell>{item.startDate}</TableCell>
                       <TableCell>{item.endDate}</TableCell>

@@ -35,6 +35,7 @@ export function StudentEnrollmentData({ students = [], enrollmentType, sx }: Stu
     PENDING: { label: 'Pending', color: 'warning' },
     APPROVED: { label: 'Approved', color: 'success' },
     REJECTED: { label: 'Rejected', color: 'error' },
+    ENROLLED: { label: 'Enrolled', color: 'success' },
   };
 
   return (

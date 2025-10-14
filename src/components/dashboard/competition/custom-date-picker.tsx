@@ -6,7 +6,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { styled } from '@mui/material/styles';
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 
 const StyledDatePicker = styled(DatePicker)(({ theme }) => ({
   [`& .${outlinedInputClasses.root}`]: {
