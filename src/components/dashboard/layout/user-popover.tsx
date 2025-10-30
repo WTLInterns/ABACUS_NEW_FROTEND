@@ -23,6 +23,11 @@ import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
 import { useUser } from '@/hooks/use-user';
 
+// Capitalize first letter of role
+function capitalizeRole(role: string): string {
+  return role.charAt(0).toUpperCase() + role.slice(1);
+}
+
 export interface UserPopoverProps {
   anchorEl: Element | null;
   onClose: () => void;
@@ -34,11 +39,6 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
   const [openConfirmDialog, setOpenConfirmDialog] = React.useState(false);
 
   const router = useRouter();
-
-  // Capitalize first letter of role
-  const capitalizeRole = (role: string) => {
-    return role.charAt(0).toUpperCase() + role.slice(1);
-  };
 
   const handleSignOut = React.useCallback(async (): Promise<void> => {
     try {

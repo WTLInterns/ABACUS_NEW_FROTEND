@@ -18,7 +18,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
@@ -107,7 +106,7 @@ export function RegionManagementForm(): React.JSX.Element {
   const [states, setStates] = React.useState<State[]>([]);
   const [districts, setDistricts] = React.useState<District[]>([]);
   const [talukas, setTalukas] = React.useState<Taluka[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const [_loading, _setLoading] = React.useState<boolean>(false);
   const [countriesLoading, setCountriesLoading] = React.useState<boolean>(false);
   const [statesLoading, setStatesLoading] = React.useState<boolean>(false);
   const [districtsLoading, setDistrictsLoading] = React.useState<boolean>(false);
@@ -266,11 +265,12 @@ export function RegionManagementForm(): React.JSX.Element {
         
         resetCountry(defaultCountryValues);
         setEditingCountry(null);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error saving country:', error);
+        const err = error as { response?: { data?: { message?: string } } };
         Swal.fire({
           title: 'Error!',
-          text: error.response?.data?.message || `Failed to ${editingCountry ? 'update' : 'add'} country. Please try again.`,
+          text: err.response?.data?.message || `Failed to ${editingCountry ? 'update' : 'add'} country. Please try again.`,
           icon: 'error',
           confirmButtonText: 'OK'
         });
@@ -312,11 +312,12 @@ export function RegionManagementForm(): React.JSX.Element {
         
         resetState(defaultStateValues);
         setEditingState(null);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error saving state:', error);
+        const err = error as { response?: { data?: { message?: string } } };
         Swal.fire({
           title: 'Error!',
-          text: error.response?.data?.message || `Failed to ${editingState ? 'update' : 'add'} state. Please try again.`,
+          text: err.response?.data?.message || `Failed to ${editingState ? 'update' : 'add'} state. Please try again.`,
           icon: 'error',
           confirmButtonText: 'OK'
         });
@@ -358,11 +359,12 @@ export function RegionManagementForm(): React.JSX.Element {
         
         resetDistrict(defaultDistrictValues);
         setEditingDistrict(null);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error saving district:', error);
+        const err = error as { response?: { data?: { message?: string } } };
         Swal.fire({
           title: 'Error!',
-          text: error.response?.data?.message || `Failed to ${editingDistrict ? 'update' : 'add'} district. Please try again.`,
+          text: err.response?.data?.message || `Failed to ${editingDistrict ? 'update' : 'add'} district. Please try again.`,
           icon: 'error',
           confirmButtonText: 'OK'
         });
@@ -404,11 +406,12 @@ export function RegionManagementForm(): React.JSX.Element {
         
         resetTaluka(defaultTalukaValues);
         setEditingTaluka(null);
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error saving taluka:', error);
+        const err = error as { response?: { data?: { message?: string } } };
         Swal.fire({
           title: 'Error!',
-          text: error.response?.data?.message || `Failed to ${editingTaluka ? 'update' : 'add'} taluka. Please try again.`,
+          text: err.response?.data?.message || `Failed to ${editingTaluka ? 'update' : 'add'} taluka. Please try again.`,
           icon: 'error',
           confirmButtonText: 'OK'
         });

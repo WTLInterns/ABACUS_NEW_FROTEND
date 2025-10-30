@@ -98,11 +98,12 @@ export function ManageStandards(): React.JSX.Element {
       reset({ name: '' });
       setIsAdding(false);
       fetchStandards(); // Refresh the list
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating standard:', error);
+      const err = error as { response?: { data?: { message?: string } } };
       Swal.fire({
         title: 'Error!',
-        text: error.response?.data?.message || 'Failed to create standard. Please try again.',
+        text: err.response?.data?.message || 'Failed to create standard. Please try again.',
         icon: 'error',
         confirmButtonText: 'OK'
       });

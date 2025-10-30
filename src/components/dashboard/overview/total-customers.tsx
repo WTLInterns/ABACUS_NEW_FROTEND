@@ -5,8 +5,6 @@ import CardContent from '@mui/material/CardContent';
 import Stack from '@mui/material/Stack';
 import type { SxProps } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
-import { ArrowDownIcon } from '@phosphor-icons/react/dist/ssr/ArrowDown';
-import { ArrowUpIcon } from '@phosphor-icons/react/dist/ssr/ArrowUp';
 import { UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
 
 export interface TotalCustomersProps {
@@ -16,7 +14,7 @@ export interface TotalCustomersProps {
   value: string;
 }
 
-export function TotalCustomers({ diff, trend, sx, value }: TotalCustomersProps): React.JSX.Element {
+export function TotalCustomers({ diff, trend: _trend, sx, value }: TotalCustomersProps): React.JSX.Element {
 
   return (
     <Card sx={sx}>

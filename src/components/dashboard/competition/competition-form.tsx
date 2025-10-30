@@ -79,9 +79,9 @@ export function CompetitionForm(): React.JSX.Element {
   const [endDate, setEndDate] = React.useState<Dayjs | null>(null);
   
   // Error states for date fields
-  const [registrationLastDateError, setRegistrationLastDateError] = React.useState<string | undefined>(undefined);
-  const [startDateError, setStartDateError] = React.useState<string | undefined>(undefined);
-  const [endDateError, setEndDateError] = React.useState<string | undefined>(undefined);
+  const [registrationLastDateError, setRegistrationLastDateError] = React.useState<string>();
+  const [startDateError, setStartDateError] = React.useState<string>();
+  const [endDateError, setEndDateError] = React.useState<string>();
 
   const {
     control,

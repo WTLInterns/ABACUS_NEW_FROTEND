@@ -99,21 +99,20 @@ export function InventoryForm(): React.JSX.Element {
   const onSubmit = React.useCallback(
     async (data: Values): Promise<void> => {
       try {
-        if (editingItem) {
-          // Update existing item
-          await updateInventoryItem(editingItem.id, {
-            itemName: data.itemName,
-            quantity: data.quantity,
-            pricePerItem: data.pricePerItem,
-          });
-        } else {
-          // Add new item
-          await addInventoryItem({
-            itemName: data.itemName,
-            quantity: data.quantity,
-            pricePerItem: data.pricePerItem,
-          });
-        }
+        // Update existing item or add new item
+        const operation = editingItem
+          ? updateInventoryItem(editingItem.id, {
+              itemName: data.itemName,
+              quantity: data.quantity,
+              pricePerItem: data.pricePerItem,
+            })
+          : addInventoryItem({
+              itemName: data.itemName,
+              quantity: data.quantity,
+              pricePerItem: data.pricePerItem,
+            });
+        
+        await operation;
         
         // Reset form and hide it
         reset(defaultValues);

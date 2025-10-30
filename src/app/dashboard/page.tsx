@@ -14,11 +14,6 @@ import { Book as BookIcon } from '@phosphor-icons/react/dist/ssr/Book';
 import { CheckCircle as CheckCircleIcon } from '@phosphor-icons/react/dist/ssr/CheckCircle';
 import { Package as PackageIcon } from '@phosphor-icons/react/dist/ssr/Package';
 
-import { config } from '@/config';
-import { Budget } from '@/components/dashboard/overview/budget';
-import { TasksProgress } from '@/components/dashboard/overview/tasks-progress';
-import { TotalCustomers } from '@/components/dashboard/overview/total-customers';
-import { TotalProfit } from '@/components/dashboard/overview/total-profit';
 import { TeacherEnrollmentData, TeacherEnrollment } from '@/components/dashboard/overview/teacher-enrollment-data';
 import apiClient from '@/services/api';
 

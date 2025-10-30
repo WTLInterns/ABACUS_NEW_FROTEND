@@ -10,7 +10,6 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { useTheme } from '@mui/material/styles';
 
 export interface Student {
   id: number;
@@ -29,8 +28,6 @@ export interface StudentEnrollmentDataProps {
 }
 
 export function StudentEnrollmentData({ students = [], enrollmentType, sx }: StudentEnrollmentDataProps): React.JSX.Element {
-  const theme = useTheme();
-  
   const statusMap: Record<string, { label: string; color: 'warning' | 'success' | 'error' | 'default' }> = {
     PENDING: { label: 'Pending', color: 'warning' },
     APPROVED: { label: 'Approved', color: 'success' },

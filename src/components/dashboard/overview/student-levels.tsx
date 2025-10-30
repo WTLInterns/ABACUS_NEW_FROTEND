@@ -1,3 +1,6 @@
+// This file is currently not in use but kept for future reference
+export {};
+
 // import * as React from 'react';
 // import Box from '@mui/material/Box';
 // import Card from '@mui/material/Card';

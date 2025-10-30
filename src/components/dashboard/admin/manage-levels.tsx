@@ -98,11 +98,12 @@ export function ManageLevels(): React.JSX.Element {
       reset({ name: '' });
       setIsAdding(false);
       fetchLevels(); // Refresh the list
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating level:', error);
+      const err = error as { response?: { data?: { message?: string } } };
       Swal.fire({
         title: 'Error!',
-        text: error.response?.data?.message || 'Failed to create level. Please try again.',
+        text: err.response?.data?.message || 'Failed to create level. Please try again.',
         icon: 'error',
         confirmButtonText: 'OK'
       });

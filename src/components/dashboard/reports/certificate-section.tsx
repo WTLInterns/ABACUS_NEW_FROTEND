@@ -9,7 +9,7 @@ import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
@@ -205,18 +205,18 @@ export function CertificateSection(): React.JSX.Element {
   };
 
   // Handle country selection
-  const handleCountryChange = (event: any) => {
+  const handleCountryChange = (event: SelectChangeEvent<string>) => {
     setSelectedCountry(event.target.value);
   };
 
   // Handle state selection
-  const handleStateChange = (event: any) => {
+  const handleStateChange = (event: SelectChangeEvent<string>) => {
     setSelectedState(event.target.value);
   };
 
   // Handle student selection
-  const handleStudentChange = (event: any) => {
-    const studentId = event.target.value;
+  const handleStudentChange = (event: SelectChangeEvent<number | ''>) => {
+    const studentId = event.target.value === '' ? null : event.target.value as number;
     setSelectedStudent(studentId);
     setSelectedLevelMark(null);
     
@@ -237,8 +237,8 @@ export function CertificateSection(): React.JSX.Element {
   };
 
   // Handle level mark selection
-  const handleLevelMarkChange = (event: any) => {
-    const index = event.target.value;
+  const handleLevelMarkChange = (event: SelectChangeEvent<number | ''>) => {
+    const index = event.target.value === '' ? null : event.target.value as number;
     setSelectedLevelMark(index);
     
     // Find the selected level mark and populate the fields
@@ -250,11 +250,6 @@ export function CertificateSection(): React.JSX.Element {
       setLevel('');
       setMarks('');
     }
-  };
-
-  // Handle search term change
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
   };
 
   // Download certificate with exact preview appearance but maximum resolution
@@ -295,8 +290,8 @@ export function CertificateSection(): React.JSX.Element {
         // Preload the SVG to ensure it's available for html2canvas
         const preloadImage = new Promise<void>((resolve, reject) => {
           const img = new Image();
-          img.onload = () => resolve();
-          img.onerror = () => reject(new Error('Failed to load certificate background'));
+          img.addEventListener('load', () => resolve());
+          img.addEventListener('error', () => reject(new Error('Failed to load certificate background')));
           img.src = '/Abacus_Certificate.svg';
         });
 
@@ -332,12 +327,12 @@ export function CertificateSection(): React.JSX.Element {
 
         if (format === 'jpg') {
           const link = document.createElement('a');
-          link.download = `certificate_${studentName.replace(/\s+/g, '_')}_${level}.jpg`;
-          link.href = canvas.toDataURL('image/jpeg', 1.0); // Maximum quality for JPG
+          link.download = `certificate_${studentName.replaceAll(/\s+/g, '_')}_${level}.jpg`;
+          link.href = canvas.toDataURL('image/jpeg', 1); // Maximum quality for JPG
           link.click();
         } else {
           // PDF format with proper DPI settings for better quality
-          const imgData = canvas.toDataURL('image/jpeg', 1.0); // Maximum quality for PDF embedding
+          const imgData = canvas.toDataURL('image/jpeg', 1); // Maximum quality for PDF embedding
           const imgWidth = canvas.width;
           const imgHeight = canvas.height;
           
@@ -366,15 +361,16 @@ export function CertificateSection(): React.JSX.Element {
           // Add image with exact dimensions to avoid any margins
           // Ultra-high DPI for superior quality output
           pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight, undefined, 'NONE'); // Maximum quality
-          pdf.save(`certificate_${studentName.replace(/\s+/g, '_')}_${level}.pdf`);
+          pdf.save(`certificate_${studentName.replaceAll(/\s+/g, '_')}_${level}.pdf`);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(`Error generating ${format.toUpperCase()}:`, err);
+        const error = err as Error;
         Swal.fire({
           title: 'Error!',
           text: `Error generating ${format.toUpperCase()}. Please try again.
           
-Technical details: ${err.message}`,
+Technical details: ${error.message}`,
           icon: 'error',
           confirmButtonText: 'OK'
         });
@@ -458,7 +454,7 @@ Technical details: ${err.message}`,
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <FormControl fullWidth disabled={!selectedState || loadingStudents}>
                 <InputLabel required>Select Student</InputLabel>
-                <Select
+                <Select<number | ''>
                   value={selectedStudent ?? ''}
                   label="Select Student"
                   onChange={handleStudentChange}
@@ -479,7 +475,7 @@ Technical details: ${err.message}`,
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <FormControl fullWidth disabled={!selectedStudent || loadingLevelMarks}>
                 <InputLabel required>Select Level</InputLabel>
-                <Select
+                <Select<number | ''>
                   value={selectedLevelMark ?? ''}
                   label="Select Level"
                   onChange={handleLevelMarkChange}

@@ -175,20 +175,18 @@ export default function LedgerPage(): React.JSX.Element {
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
     
-    if (!purchaseForm.quantity) {
-      errors.quantity = 'Quantity is required';
-    } else {
+    if (purchaseForm.quantity) {
       const quantity = Number.parseInt(purchaseForm.quantity, 10);
       if (Number.isNaN(quantity) || quantity <= 0) {
         errors.quantity = 'Quantity must be a positive number';
       } else if (selectedItem && quantity > selectedItem.quantity) {
         errors.quantity = `Quantity cannot exceed available stock (${selectedItem.quantity})`;
       }
+    } else {
+      errors.quantity = 'Quantity is required';
     }
     
-    if (!purchaseForm.paidPrice) {
-      errors.paidPrice = 'Paid price is required';
-    } else {
+    if (purchaseForm.paidPrice) {
       const paidPrice = Number.parseFloat(purchaseForm.paidPrice);
       if (Number.isNaN(paidPrice) || paidPrice < 0) {
         errors.paidPrice = 'Paid price must be a valid number';
@@ -199,6 +197,8 @@ export default function LedgerPage(): React.JSX.Element {
           errors.paidPrice = `Paid price cannot exceed total price (${totalPrice})`;
         }
       }
+    } else {
+      errors.paidPrice = 'Paid price is required';
     }
     
     // Payment screenshot is mandatory

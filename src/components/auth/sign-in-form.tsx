@@ -53,7 +53,7 @@ export function SignInForm(): React.JSX.Element {
   const {
     control,
     handleSubmit,
-    setError,
+    setError: _setError,
     formState: { errors },
   } = useForm<Values>({ resolver: zodResolver(schema) });
 
