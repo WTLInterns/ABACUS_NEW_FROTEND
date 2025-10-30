@@ -34,6 +34,7 @@ export const teacherNavItems = [
   },
 ] satisfies NavItemConfig[];
 
+
 // Admin navigation items (for MASTER_ADMIN)
 export const adminNavItems = [
   { key: 'overview', title: 'Overview', href: paths.dashboard.admin, icon: 'chart-pie' },

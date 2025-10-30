@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosError } f
 import { clearAllClientSideData } from '@/lib/storage';
 
 // Define the base URL for your API
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8085';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.vertexabacus.com';
 
 // Create an Axios instance with default configuration
 const apiClient: AxiosInstance = axios.create({
