@@ -82,7 +82,8 @@ const schema = zod.object({
   taluka: zod.string().min(1, { message: 'Taluka is required' }),
   address: zod.string().min(1, { message: 'Address is required' }),
   city: zod.string().min(1, { message: 'City is required' }),
-  email: zod.string().email({ message: 'Valid email is required' })
+  email: zod.string().email({ message: 'Valid email is required' }),
+  pinCode: zod.string().min(1, { message: 'Pin Code is required' })
 });
 
 type Values = zod.infer<typeof schema>;
@@ -105,6 +106,7 @@ const defaultValues = {
   address: '',
   city: '',
   email: '',
+  pinCode: '',
 };
 
 interface StudentFormProps {
@@ -813,6 +815,20 @@ export function StudentEnrollmentForm(): React.JSX.Element {
                     <InputLabel required>City</InputLabel>
                     <OutlinedInput {...field} label="City" />
                     {errors.city ? <FormHelperText>{errors.city.message}</FormHelperText> : null}
+                  </FormControl>
+                )}
+              />
+            </Grid>
+            
+            <Grid size={{ md: 4, xs: 12 }}>
+              <Controller
+                control={control}
+                name="pinCode"
+                render={({ field }) => (
+                  <FormControl error={Boolean(errors.pinCode)} fullWidth>
+                    <InputLabel required>Pin Code</InputLabel>
+                    <OutlinedInput {...field} label="Pin Code" />
+                    {errors.pinCode ? <FormHelperText>{errors.pinCode.message}</FormHelperText> : null}
                   </FormControl>
                 )}
               />

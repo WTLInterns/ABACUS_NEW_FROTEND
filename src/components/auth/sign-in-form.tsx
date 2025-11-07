@@ -5,6 +5,8 @@ import RouterLink from 'next/link';
 import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 import FormControl from '@mui/material/FormControl';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputLabel from '@mui/material/InputLabel';
@@ -66,6 +68,15 @@ export function SignInForm(): React.JSX.Element {
     }
   }, []);
 
+  // Hide page scrollbar while on the sign-in screen
+  React.useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
   const onSubmit = React.useCallback(
     async (values: Values): Promise<void> => {
       setIsPending(true);
@@ -123,116 +134,172 @@ export function SignInForm(): React.JSX.Element {
   };
 
   return (
-    <Stack spacing={4}>
-      <Stack spacing={1}>
-        <Typography variant="h4">Sign in</Typography>
-      </Stack>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={2}>
-          <Controller
-            control={control}
-            name="accountType"
-            render={({ field }) => (
-              <FormControl error={Boolean(errors.accountType)}>
-                <InputLabel>Account Type</InputLabel>
-                <Select
-                  label=""
-                  displayEmpty
-                  value={(field.value as string | undefined) ?? ''}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  inputRef={field.ref}
-                  name={field.name}
-                >                 
-                  <MenuItem value="teacher">Teacher</MenuItem>
-                  <MenuItem value="admin">Admin</MenuItem>
-                </Select>
-                {errors.accountType ? <FormHelperText>{errors.accountType.message}</FormHelperText> : null}
-              </FormControl>
-            )}
-          />
-          <Controller
-            control={control}
-            name="email"
-            render={({ field }) => (
-              <FormControl error={Boolean(errors.email)}>
-                <InputLabel>Email address</InputLabel>
-                <OutlinedInput
-                  label="Email address"
-                  type="email"
-                  value={field.value ?? ''}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  inputRef={field.ref}
-                  name={field.name}
-                />
-                {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
-              </FormControl>
-            )}
-          />
-          <Controller
-            control={control}
-            name="password"
-            render={({ field }) => (
-              <FormControl error={Boolean(errors.password)}>
-                <InputLabel>Password</InputLabel>
-                <OutlinedInput
-                  value={field.value ?? ''}
-                  onChange={field.onChange}
-                  onBlur={field.onBlur}
-                  inputRef={field.ref}
-                  name={field.name}
-                  endAdornment={
-                    showPassword ? (
-                      <EyeIcon
-                        cursor="pointer"
-                        fontSize="var(--icon-fontSize-md)"
-                        onClick={(): void => {
-                          setShowPassword(false);
-                        }}
-                      />
-                    ) : (
-                      <EyeSlashIcon
-                        cursor="pointer"
-                        fontSize="var(--icon-fontSize-md)"
-                        onClick={(): void => {
-                          setShowPassword(true);
-                        }}
-                      />
-                    )
-                  }
-                  label="Password"
-                  type={showPassword ? 'text' : 'password'}
-                />
-                {errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
-              </FormControl>
-            )}
-          />
-          <div>
-            <Link component={RouterLink} href={paths.auth.resetPassword} variant="subtitle2">
-              Forgot password?
-            </Link>
-          </div>
-          {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
-          <LoadingButton loading={isPending} type="submit" variant="contained" loadingText="Signing in...">
-            Sign in
-          </LoadingButton>
+    <>
+      {/* Background layer 1: blurred cover to occupy the entire screen without visible edges */}
+      <Box
+        sx={{
+          position: 'fixed',
+          inset: 0,
+          backgroundImage: 'url(/assets/loginbackroundimage.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          filter: 'blur(12px)',
+          transform: 'scale(1.05)',
+          zIndex: 0,
+        }}
+      />
+      {/* Background layer 2: sharp image fully visible without zoom */}
+      <Box
+        component="img"
+        src="/assets/loginbackroundimage.png"
+        alt="Login background"
+        sx={{
+          position: 'fixed',
+          inset: 0,
+          width: '100vw',
+          height: '100vh',
+          objectFit: 'contain',
+          objectPosition: 'center',
+          zIndex: 1,
+          pointerEvents: 'none'
+        }}
+      />
+      <Box sx={{
+        minHeight: '100vh',
+        display: 'grid',
+        placeItems: 'center',
+        px: 2,
+        py: 6,
+        position: 'relative',
+        zIndex: 2,
+      }}>
+        <Paper elevation={10} sx={{
+          position: 'relative',
+          width: '100%',
+          maxWidth: 460,
+          borderRadius: 3,
+          p: { xs: 3, sm: 4 },
+          bgcolor: 'rgba(255,255,255,0.9)',
+          backdropFilter: 'blur(6px)'
+        }}>
+          <Stack spacing={3}>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Box component="img" src="/assets/abacusLogo.png" alt="Abacus" sx={{ height: 48, width: 'auto' }} />
+            </Stack>
+            <Stack spacing={1} sx={{ textAlign: 'center' }}>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>Sign in</Typography>
+              <Typography variant="body2" color="text.secondary">Welcome back to Abacus</Typography>
+            </Stack>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Stack spacing={2.5}>
+            <Controller
+                control={control}
+                name="accountType"
+                render={({ field }) => (
+                  <FormControl error={Boolean(errors.accountType)} fullWidth>
+                    <InputLabel>Account Type</InputLabel>
+                    <Select
+                      label="Account Type"
+                      displayEmpty
+                      value={(field.value as string | undefined) ?? ''}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      inputRef={field.ref}
+                      name={field.name}
+                    >
+                      <MenuItem value="teacher">Teacher</MenuItem>
+                      <MenuItem value="admin">Admin</MenuItem>
+                    </Select>
+                    {errors.accountType ? <FormHelperText>{errors.accountType.message}</FormHelperText> : null}
+                  </FormControl>
+                )}
+              />
+              <Controller
+                control={control}
+                name="email"
+                render={({ field }) => (
+                  <FormControl error={Boolean(errors.email)} fullWidth>
+                    <InputLabel>Email address</InputLabel>
+                    <OutlinedInput
+                      label="Email address"
+                      type="email"
+                      value={field.value ?? ''}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      inputRef={field.ref}
+                      name={field.name}
+                    />
+                    {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
+                  </FormControl>
+                )}
+              />
+              <Controller
+                control={control}
+                name="password"
+                render={({ field }) => (
+                  <FormControl error={Boolean(errors.password)} fullWidth>
+                    <InputLabel>Password</InputLabel>
+                    <OutlinedInput
+                      value={field.value ?? ''}
+                      onChange={field.onChange}
+                      onBlur={field.onBlur}
+                      inputRef={field.ref}
+                      name={field.name}
+                      endAdornment={
+                        showPassword ? (
+                          <EyeIcon
+                            cursor="pointer"
+                            fontSize="var(--icon-fontSize-md)"
+                            onClick={(): void => {
+                              setShowPassword(false);
+                            }}
+                          />
+                        ) : (
+                          <EyeSlashIcon
+                            cursor="pointer"
+                            fontSize="var(--icon-fontSize-md)"
+                            onClick={(): void => {
+                              setShowPassword(true);
+                            }}
+                          />
+                        )
+                      }
+                      label="Password"
+                      type={showPassword ? 'text' : 'password'}
+                    />
+                    {errors.password ? <FormHelperText>{errors.password.message}</FormHelperText> : null}
+                  </FormControl>
+                )}
+              />
+              <div>
+                <Link component={RouterLink} href={paths.auth.resetPassword} variant="subtitle2">
+                  Forgot password?
+                </Link>
+              </div>
+              {errors.root ? <Alert color="error">{errors.root.message}</Alert> : null}
+              <LoadingButton loading={isPending} type="submit" variant="contained" loadingText="Signing in..." sx={{ py: 1.2 }}>
+                Sign in
+              </LoadingButton>
+            </Stack>
+          </form>
+          <Snackbar
+            open={notification.open}
+            autoHideDuration={6000}
+            onClose={handleCloseNotification}
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          >
+            <Alert 
+              onClose={handleCloseNotification} 
+              severity={notification.severity} 
+              sx={{ width: '100%' }}
+            >
+              {notification.message}
+            </Alert>
+          </Snackbar>
         </Stack>
-      </form>
-      <Snackbar
-        open={notification.open}
-        autoHideDuration={6000}
-        onClose={handleCloseNotification}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert 
-          onClose={handleCloseNotification} 
-          severity={notification.severity} 
-          sx={{ width: '100%' }}
-        >
-          {notification.message}
-        </Alert>
-      </Snackbar>
-    </Stack>
+        </Paper>
+      </Box>
+    </>
   );
 }

@@ -37,22 +37,24 @@ export const teacherNavItems = [
 
 // Admin navigation items (for MASTER_ADMIN)
 export const adminNavItems = [
-  { key: 'overview', title: 'Overview', href: paths.dashboard.admin, icon: 'chart-pie' },
+  { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
   { key: 'teachers', title: 'Teachers', href: paths.dashboard.teachers, icon: 'users' },
   { key: 'students', title: 'Manage Students', href: paths.dashboard.adminStudents, icon: 'graduation-cap' },
   { key: 'standards', title: 'Manage Standards', href: paths.dashboard.standards, icon: 'list-numbers' },
   { key: 'levels', title: 'Manage Levels', href: paths.dashboard.levels, icon: 'chart-bar' },
   { key: 'inventory', title: 'Manage Inventory', href: paths.dashboard.inventory, icon: 'package' },
+  { key: 'enquiries', title: 'Enquiry', href: paths.dashboard.enquiries, icon: 'chat-circle-text' },
   { key: 'competition', title: 'Manage Competitions', href: paths.dashboard.competition, icon: 'trophy' },
 ] satisfies NavItemConfig[];
 
 // Master Admin navigation items (if different from admin)
 export const masterAdminNavItems = [
-  { key: 'overview', title: 'Overview', href: paths.dashboard.admin, icon: 'chart-pie' },
+  { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
   { key: 'teachers', title: 'Teachers', href: paths.dashboard.teachers, icon: 'users' },
   { key: 'students', title: 'Manage Students', href: paths.dashboard.adminStudents, icon: 'graduation-cap' },
   { key: 'standards', title: 'Manage Standards', href: paths.dashboard.standards, icon: 'list-numbers' },
   { key: 'levels', title: 'Manage Levels', href: paths.dashboard.levels, icon: 'chart-bar' },
   { key: 'inventory', title: 'Manage Inventory', href: paths.dashboard.inventory, icon: 'package' },
+  { key: 'enquiries', title: 'Enquiry', href: paths.dashboard.enquiries, icon: 'chat-circle-text' },
   { key: 'competition', title: 'Manage Competitions', href: paths.dashboard.competition, icon: 'trophy' },
 ] satisfies NavItemConfig[];

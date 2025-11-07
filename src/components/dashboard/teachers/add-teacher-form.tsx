@@ -27,6 +27,7 @@ import apiClient from '@/services/api';
 import Swal from 'sweetalert2';
 import { LoadingButton } from '@/components/core/loading-button';
 import { Button, Stack } from '@mui/material';
+import { createTeacherWithImages, deleteTeacher as deleteTeacherApi } from '@/services/teacher-service';
 
 const schema = zod.object({
   firstName: zod.string().min(1, { message: 'First name is required' }),
@@ -62,19 +63,23 @@ export function AddTeacherForm(): React.JSX.Element {
   const [branches, setBranches] = React.useState<string[]>(['']);
   const [teachers, setTeachers] = React.useState<any[]>([]);
   const [isSubmitting, setIsSubmitting] = React.useState(false); // State for spinner
+  const [aadharFile, setAadharFile] = React.useState<File | null>(null);
+  const [marksheetFile, setMarksheetFile] = React.useState<File | null>(null);
+  const [deletingId, setDeletingId] = React.useState<number | null>(null);
 
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<Values>({ 
-    defaultValues, 
+  } = useForm<Values>({
+    defaultValues,
     resolver: zodResolver(schema) as any // Type assertion to avoid resolver type issues
   });
 
   const onSubmit = React.useCallback(
     async (data: Values): Promise<void> => {
+      if (isSubmitting) return; // guard against double submissions
       // Set submitting state to show spinner
       setIsSubmitting(true);
       
@@ -110,12 +115,16 @@ export function AddTeacherForm(): React.JSX.Element {
           invoice: data.invoice,
         };
         
-        // Make API call to register teacher
-        const response = await apiClient.post(`/register/${masterAdminId}`, requestData);
+        // Make API call to register teacher with images (multipart)
+        const responseData = await createTeacherWithImages(requestData as any, {
+          masterAdminId: Number(masterAdminId),
+          addharImage: aadharFile,
+          markshitImage: marksheetFile,
+        });
         
         // Add to teachers list
         const newTeacher = {
-          id: response.data.id,
+          id: responseData.id,
           ...data,
         };
         
@@ -132,6 +141,8 @@ export function AddTeacherForm(): React.JSX.Element {
         // Reset form
         reset(defaultValues);
         setBranches(['']);
+        setAadharFile(null);
+        setMarksheetFile(null);
       } catch (error) {
         console.error('Error adding teacher:', error);
         // Show error popup
@@ -146,8 +157,30 @@ export function AddTeacherForm(): React.JSX.Element {
         setIsSubmitting(false);
       }
     },
-    [teachers, reset, branches]
+    [teachers, reset, branches, aadharFile, marksheetFile]
   );
+
+  const handleDelete = React.useCallback(async (id: number) => {
+    const res = await Swal.fire({
+      title: 'Delete teacher?',
+      text: 'This will also delete associated images.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      confirmButtonColor: '#d33'
+    });
+    if (!res.isConfirmed) return;
+    try {
+      setDeletingId(id);
+      await deleteTeacherApi(id);
+      setTeachers((prev) => prev.filter((t) => t.id !== id));
+      Swal.fire('Deleted', 'Teacher removed successfully', 'success');
+    } catch (err) {
+      Swal.fire('Error', 'Failed to delete teacher', 'error');
+    } finally {
+      setDeletingId(null);
+    }
+  }, []);
 
   React.useEffect(() => {
     const getAllTeachers = async () => {
@@ -364,6 +397,30 @@ export function AddTeacherForm(): React.JSX.Element {
               />
             </Grid>
             <Grid size={{ md: 6, xs: 12 }}>
+              <FormControl fullWidth>
+                <InputLabel shrink>Aadhar Image</InputLabel>
+                <TextField
+                  type="file"
+                  inputProps={{ accept: 'image/*' }}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setAadharFile(e.target.files?.[0] || null)
+                  }
+                />
+              </FormControl>
+            </Grid>
+            <Grid size={{ md: 6, xs: 12 }}>
+              <FormControl fullWidth>
+                <InputLabel shrink>Marksheet Image</InputLabel>
+                <TextField
+                  type="file"
+                  inputProps={{ accept: 'image/*' }}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setMarksheetFile(e.target.files?.[0] || null)
+                  }
+                />
+              </FormControl>
+            </Grid>
+            <Grid size={{ md: 6, xs: 12 }}>
               <Controller
                 control={control}
                 name="paymentType"
@@ -388,6 +445,7 @@ export function AddTeacherForm(): React.JSX.Element {
                   type="submit" 
                   variant="contained" 
                   onClick={handleSubmit(onSubmit)}
+                  disabled={isSubmitting}
                   loadingText="Adding..."
                 >
                   Add Teacher
@@ -413,6 +471,7 @@ export function AddTeacherForm(): React.JSX.Element {
                     <TableCell>Email</TableCell>
                     <TableCell>Role</TableCell>
                     <TableCell>Branch Name</TableCell>
+                    <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -424,6 +483,17 @@ export function AddTeacherForm(): React.JSX.Element {
                       <TableCell>{teacher.email}</TableCell>
                       <TableCell>{teacher.role}</TableCell>
                       <TableCell>{teacher.branchNames}</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          onClick={() => handleDelete(teacher.id)}
+                          disabled={deletingId === teacher.id}
+                        >
+                          {deletingId === teacher.id ? 'Deleting...' : 'Delete'}
+                        </Button>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

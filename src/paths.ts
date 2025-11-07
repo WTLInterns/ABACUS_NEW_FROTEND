@@ -26,6 +26,7 @@ export const paths = {
     standards: '/dashboard/admin/standards',
     levels: '/dashboard/admin/levels',
     inventory: '/dashboard/inventory',
+    enquiries: '/dashboard/enquiries',
   },
   errors: { notFound: '/errors/not-found' },
 } as const;

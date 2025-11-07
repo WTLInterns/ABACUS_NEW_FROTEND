@@ -55,14 +55,14 @@ export function MainNav(): React.JSX.Element {
               <ListIcon />
             </IconButton>
             {/* Logo added here */}
-            <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
+            {/* <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
               <DynamicLogo height={40} width={120} />
-            </Box>
-            <Tooltip title="Search">
+            </Box> */}
+            {/* <Tooltip title="Search">
               <IconButton>
                 <MagnifyingGlassIcon />
               </IconButton>
-            </Tooltip>
+            </Tooltip> */}
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
             {user && (

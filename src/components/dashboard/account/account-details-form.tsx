@@ -10,18 +10,13 @@ import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Grid';
 import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
-import Select from '@mui/material/Select';
+import { useUser } from '@/hooks/use-user';
 
-const states = [
-  { value: 'alabama', label: 'Alabama' },
-  { value: 'new-york', label: 'New York' },
-  { value: 'san-francisco', label: 'San Francisco' },
-  { value: 'los-angeles', label: 'Los Angeles' },
-] as const;
+// Only showing id, firstName, lastName, email, role
 
 export function AccountDetailsForm(): React.JSX.Element {
+  const { user } = useUser();
   return (
     <form
       onSubmit={(event) => {
@@ -41,7 +36,7 @@ export function AccountDetailsForm(): React.JSX.Element {
             >
               <FormControl fullWidth required>
                 <InputLabel>First name</InputLabel>
-                <OutlinedInput defaultValue="Sofia" label="First name" name="firstName" />
+                <OutlinedInput defaultValue={user?.firstName ?? ''} label="First name" name="firstName" />
               </FormControl>
             </Grid>
             <Grid
@@ -52,7 +47,29 @@ export function AccountDetailsForm(): React.JSX.Element {
             >
               <FormControl fullWidth required>
                 <InputLabel>Last name</InputLabel>
-                <OutlinedInput defaultValue="Rivers" label="Last name" name="lastName" />
+                <OutlinedInput defaultValue={user?.lastName ?? ''} label="Last name" name="lastName" />
+              </FormControl>
+            </Grid>
+            <Grid
+              size={{
+                md: 6,
+                xs: 12,
+              }}
+            >
+              <FormControl fullWidth>
+                <InputLabel>ID</InputLabel>
+                <OutlinedInput label="ID" name="id" defaultValue={user?.id ?? ''} disabled />
+              </FormControl>
+            </Grid>
+            <Grid
+              size={{
+                md: 6,
+                xs: 12,
+              }}
+            >
+              <FormControl fullWidth>
+                <InputLabel>Role</InputLabel>
+                <OutlinedInput label="Role" name="role" defaultValue={(user as any)?.role ?? ''} disabled />
               </FormControl>
             </Grid>
             <Grid
@@ -63,46 +80,7 @@ export function AccountDetailsForm(): React.JSX.Element {
             >
               <FormControl fullWidth required>
                 <InputLabel>Email address</InputLabel>
-                <OutlinedInput defaultValue="sofia@abacus.io" label="Email address" name="email" />
-              </FormControl>
-            </Grid>
-            <Grid
-              size={{
-                md: 6,
-                xs: 12,
-              }}
-            >
-              <FormControl fullWidth>
-                <InputLabel>Phone number</InputLabel>
-                <OutlinedInput label="Phone number" name="phone" type="tel" />
-              </FormControl>
-            </Grid>
-            <Grid
-              size={{
-                md: 6,
-                xs: 12,
-              }}
-            >
-              <FormControl fullWidth>
-                <InputLabel>State</InputLabel>
-                <Select defaultValue="New York" label="State" name="state" variant="outlined">
-                  {states.map((option) => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid
-              size={{
-                md: 6,
-                xs: 12,
-              }}
-            >
-              <FormControl fullWidth>
-                <InputLabel>City</InputLabel>
-                <OutlinedInput label="City" />
+                <OutlinedInput defaultValue={user?.email ?? ''} label="Email address" name="email" />
               </FormControl>
             </Grid>
           </Grid>

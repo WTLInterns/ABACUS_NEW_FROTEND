@@ -22,9 +22,9 @@ export function Logo({ color = 'dark', emblem, height = HEIGHT, width = WIDTH }:
   let url: string;
 
   if (emblem) {
-    url = color === 'light' ? '/assets/' : '/assets/abacus-logo.jpeg';
+    url = color === 'light' ? '/assets/' : '/assets/abacusLogo.png';
   } else {
-    url = color === 'light' ? '/assets/abacus-logo.jpeg' : '/assets/abacus-logo.jpeg';
+    url = color === 'light' ? '/assets/abacusLogo.png' : '/assets/abacusLogo.png';
   }
 
   return <Box alt="logo" component="img" height={height} src={url} width={width} />;
