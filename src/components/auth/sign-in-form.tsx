@@ -140,7 +140,7 @@ export function SignInForm(): React.JSX.Element {
         sx={{
           position: 'fixed',
           inset: 0,
-          backgroundImage: 'url(/assets/loginbackroundimage.png)',
+          backgroundImage: 'url(/assets/adminBackground.png)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -152,8 +152,8 @@ export function SignInForm(): React.JSX.Element {
       {/* Background layer 2: sharp image fully visible without zoom */}
       <Box
         component="img"
-        src="/assets/loginbackroundimage.png"
-        alt="Login background"
+        src="/assets/adminBackground.png"
+        alt="Admin background"
         sx={{
           position: 'fixed',
           inset: 0,
@@ -168,31 +168,34 @@ export function SignInForm(): React.JSX.Element {
       <Box sx={{
         minHeight: '100vh',
         display: 'grid',
-        placeItems: 'center',
+        placeItems: 'start',
         px: 2,
-        py: 6,
+        pt: 2,
+        pb: 1,
+        marginTop: '-1rem',
         position: 'relative',
         zIndex: 2,
       }}>
         <Paper elevation={10} sx={{
           position: 'relative',
           width: '100%',
-          maxWidth: 460,
+          maxWidth: 320,
           borderRadius: 3,
-          p: { xs: 3, sm: 4 },
-          bgcolor: 'rgba(255,255,255,0.9)',
+          marginTop: '1.5rem',
+          p: { xs: 1.5, sm: 2 },
+          bgcolor: 'rgba(255,255,255,0.95)',
           backdropFilter: 'blur(6px)'
         }}>
-          <Stack spacing={3}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Box component="img" src="/assets/abacusLogo.png" alt="Abacus" sx={{ height: 48, width: 'auto' }} />
+          <Stack spacing={1.5}>
+            <Stack direction="row" justifyContent="center">
+              <Box component="img" src="/assets/abacusLogo.png" alt="Abacus" sx={{ height: 36, width: 'auto' }} />
             </Stack>
-            <Stack spacing={1} sx={{ textAlign: 'center' }}>
-              <Typography variant="h4" sx={{ fontWeight: 700 }}>Sign in</Typography>
-              <Typography variant="body2" color="text.secondary">Welcome back to Abacus</Typography>
+            <Stack spacing={0.25} sx={{ textAlign: 'center' }}>
+              <Typography variant="h6" sx={{ fontWeight: 600, fontSize: '1.15rem' }}>Sign in</Typography>
+              <Typography variant="caption" color="text.secondary">Welcome back to Abacus</Typography>
             </Stack>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <Stack spacing={2.5}>
+              <Stack spacing={1.5}>
             <Controller
                 control={control}
                 name="accountType"
