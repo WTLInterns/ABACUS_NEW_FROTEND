@@ -185,14 +185,14 @@ export function ManageLevels(): React.JSX.Element {
           <Table sx={{ minWidth: '800px' }}>
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
+                {/* <TableCell>ID</TableCell> */}
                 <TableCell>Level Name</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {visibleRows.map((level) => (
                 <TableRow hover key={level.id}>
-                  <TableCell>{level.id}</TableCell>
+                  {/* <TableCell>{level.id}</TableCell> */}
                   <TableCell>{level.name}</TableCell>
                 </TableRow>
               ))}

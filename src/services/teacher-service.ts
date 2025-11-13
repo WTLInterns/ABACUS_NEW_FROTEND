@@ -13,6 +13,7 @@ export interface TeacherRequestsDto {
   education?: string;
   markshit?: string;
   invoice?: string;
+  profilePicture?: string;
 }
 
 export async function deleteTeacher(id: number): Promise<void> {
@@ -27,6 +28,12 @@ export interface TeacherResponseDto {
   masterAdminName?: string;
   role?: string;
   branchNames?: string[];
+  profilePicture?: string; // Add profile picture to response
+}
+
+export async function getTeacherById(id: number): Promise<TeacherResponseDto> {
+  const res = await apiClient.get<TeacherResponseDto>(`/teachers/${id}`);
+  return res.data;
 }
 
 export async function createTeacherWithImages(
@@ -35,6 +42,7 @@ export async function createTeacherWithImages(
     masterAdminId: number;
     addharImage?: File | null;
     markshitImage?: File | null;
+    profilePicture?: File | null;
   }
 ): Promise<TeacherResponseDto> {
   const fd = new FormData();
@@ -42,14 +50,21 @@ export async function createTeacherWithImages(
   fd.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
   if (options.addharImage) fd.append('addharImage', options.addharImage);
   if (options.markshitImage) fd.append('markshitImage', options.markshitImage);
+  if (options.profilePicture) fd.append('profilePicture', options.profilePicture);
 
   const res = await apiClient.post< TeacherResponseDto >(
-    `/teachers`,
+    `/teachers?masterAdminId=${options.masterAdminId}`,
     fd,
     {
-      params: { masterAdminId: options.masterAdminId },
-      headers: { 'Content-Type': 'multipart/form-data' },
+      headers: { 
+        'Content-Type': 'multipart/form-data',
+      },
     }
   );
+  return res.data;
+}
+
+export async function updateTeacher(id: number, data: TeacherRequestsDto): Promise<TeacherResponseDto> {
+  const res = await apiClient.put<TeacherResponseDto>(`/teachers/${id}`, data);
   return res.data;
 }

@@ -185,14 +185,14 @@ export function ManageStandards(): React.JSX.Element {
           <Table sx={{ minWidth: '800px' }}>
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
+                {/* <TableCell>ID</TableCell> */}
                 <TableCell>Standard Name</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {visibleRows.map((standard) => (
                 <TableRow hover key={standard.id}>
-                  <TableCell>{standard.id}</TableCell>
+                  {/* <TableCell>{standard.id}</TableCell> */}
                   <TableCell>{standard.name}</TableCell>
                 </TableRow>
               ))}

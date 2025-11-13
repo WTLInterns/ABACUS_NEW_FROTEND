@@ -28,6 +28,7 @@ import Swal from 'sweetalert2';
 import { LoadingButton } from '@/components/core/loading-button';
 import { Button, Stack } from '@mui/material';
 import { createTeacherWithImages, deleteTeacher as deleteTeacherApi } from '@/services/teacher-service';
+import Link from 'next/link';
 
 const schema = zod.object({
   firstName: zod.string().min(1, { message: 'First name is required' }),
@@ -65,6 +66,8 @@ export function AddTeacherForm(): React.JSX.Element {
   const [isSubmitting, setIsSubmitting] = React.useState(false); // State for spinner
   const [aadharFile, setAadharFile] = React.useState<File | null>(null);
   const [marksheetFile, setMarksheetFile] = React.useState<File | null>(null);
+  const [profilePictureFile, setProfilePictureFile] = React.useState<File | null>(null);
+  const [profilePicturePreview, setProfilePicturePreview] = React.useState<string | null>(null);
   const [deletingId, setDeletingId] = React.useState<number | null>(null);
 
   const {
@@ -76,6 +79,19 @@ export function AddTeacherForm(): React.JSX.Element {
     defaultValues,
     resolver: zodResolver(schema) as any // Type assertion to avoid resolver type issues
   });
+
+  // Handle profile picture preview
+  React.useEffect(() => {
+    if (profilePictureFile) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePicturePreview(reader.result as string);
+      };
+      reader.readAsDataURL(profilePictureFile);
+    } else {
+      setProfilePicturePreview(null);
+    }
+  }, [profilePictureFile]);
 
   const onSubmit = React.useCallback(
     async (data: Values): Promise<void> => {
@@ -120,12 +136,14 @@ export function AddTeacherForm(): React.JSX.Element {
           masterAdminId: Number(masterAdminId),
           addharImage: aadharFile,
           markshitImage: marksheetFile,
+          profilePicture: profilePictureFile,
         });
         
         // Add to teachers list
         const newTeacher = {
           id: responseData.id,
           ...data,
+          profilePicture: profilePicturePreview // Add profile picture preview to the teacher data
         };
         
         setTeachers([...teachers, newTeacher]);
@@ -143,6 +161,8 @@ export function AddTeacherForm(): React.JSX.Element {
         setBranches(['']);
         setAadharFile(null);
         setMarksheetFile(null);
+        setProfilePictureFile(null);
+        setProfilePicturePreview(null);
       } catch (error) {
         console.error('Error adding teacher:', error);
         // Show error popup
@@ -157,7 +177,7 @@ export function AddTeacherForm(): React.JSX.Element {
         setIsSubmitting(false);
       }
     },
-    [teachers, reset, branches, aadharFile, marksheetFile]
+    [teachers, reset, branches, aadharFile, marksheetFile, profilePictureFile]
   );
 
   const handleDelete = React.useCallback(async (id: number) => {
@@ -420,6 +440,39 @@ export function AddTeacherForm(): React.JSX.Element {
                 />
               </FormControl>
             </Grid>
+            {/* Profile Picture Field */}
+            <Grid size={{ md: 6, xs: 12 }}>
+              <FormControl fullWidth>
+                <InputLabel shrink>Profile Picture</InputLabel>
+                <TextField
+                  type="file"
+                  inputProps={{ accept: 'image/*' }}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setProfilePictureFile(e.target.files?.[0] || null)
+                  }
+                />
+              </FormControl>
+              {/* Profile Picture Preview */}
+              {profilePicturePreview && (
+                <Box mt={2} textAlign="center">
+                  <Typography variant="subtitle2" gutterBottom>
+                    Profile Picture Preview
+                  </Typography>
+                  <img
+                    src={profilePicturePreview}
+                    alt="Profile Preview"
+                    style={{
+                      width: '100px',
+                      height: '100px',
+                      borderRadius: '50%',
+                      border: '1px solid #ddd',
+                      padding: '3px',
+                      objectFit: 'cover',
+                    }}
+                  />
+                </Box>
+              )}
+            </Grid>
             <Grid size={{ md: 6, xs: 12 }}>
               <Controller
                 control={control}
@@ -466,6 +519,7 @@ export function AddTeacherForm(): React.JSX.Element {
                 <TableHead>
                   <TableRow>
                     <TableCell>ID</TableCell>
+                    <TableCell>Profile</TableCell>
                     <TableCell>First Name</TableCell>
                     <TableCell>Last Name</TableCell>
                     <TableCell>Email</TableCell>
@@ -478,12 +532,62 @@ export function AddTeacherForm(): React.JSX.Element {
                   {teachers.map((teacher) => (
                     <TableRow key={teacher.id}>
                       <TableCell>{teacher.id}</TableCell>
-                      <TableCell>{teacher.firstName}</TableCell>
-                      <TableCell>{teacher.lastName}</TableCell>
+                      <TableCell>
+                        {teacher.profilePicture ? (
+                          <img
+                            src={teacher.profilePicture}
+                            alt="Profile"
+                            style={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '50%',
+                              objectFit: 'cover',
+                              border: '1px solid #ddd',
+                            }}
+                          />
+                        ) : (
+                          <Box
+                            sx={{
+                              width: '40px',
+                              height: '40px',
+                              borderRadius: '50%',
+                              backgroundColor: '#f0f0f0',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              border: '1px solid #ddd',
+                              fontSize: '12px',
+                              color: '#666',
+                            }}
+                          >
+                            No Image
+                          </Box>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Link href={`/dashboard/teachers/profile?id=${teacher.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                          {teacher.firstName}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link href={`/dashboard/teachers/profile?id=${teacher.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                          {teacher.lastName}
+                        </Link>
+                      </TableCell>
                       <TableCell>{teacher.email}</TableCell>
                       <TableCell>{teacher.role}</TableCell>
-                      <TableCell>{teacher.branchNames}</TableCell>
+                      <TableCell>{teacher.branchNames?.join(', ') || ''}</TableCell>
                       <TableCell>
+                        {/* <Button
+                          component={Link}
+                          href={`/dashboard/teachers/profile?id=${teacher.id}`}
+                          variant="outlined"
+                          color="primary"
+                          size="small"
+                          sx={{ mr: 1 }}
+                        >
+                          View
+                        </Button> */}
                         <Button
                           variant="outlined"
                           color="error"
