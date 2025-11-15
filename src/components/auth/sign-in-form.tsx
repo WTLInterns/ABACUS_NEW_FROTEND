@@ -17,6 +17,8 @@ import Typography from '@mui/material/Typography';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Snackbar from '@mui/material/Snackbar';
+import gsap from 'gsap';
+
 import { EyeIcon } from '@phosphor-icons/react/dist/ssr/Eye';
 import { EyeSlashIcon } from '@phosphor-icons/react/dist/ssr/EyeSlash';
 import { Controller, useForm } from 'react-hook-form';
@@ -52,6 +54,8 @@ export function SignInForm(): React.JSX.Element {
     severity: 'success',
   });
 
+  const titleRef = React.useRef<HTMLDivElement | null>(null);
+
   const {
     control,
     handleSubmit,
@@ -75,6 +79,21 @@ export function SignInForm(): React.JSX.Element {
     return () => {
       document.body.style.overflow = prev;
     };
+  }, []);
+
+  React.useEffect(() => {
+    if (!titleRef.current) return;
+
+    gsap.fromTo(
+      titleRef.current,
+      { xPercent: 100 },
+      {
+        xPercent: -100,
+        duration: 12,
+        ease: 'linear',
+        repeat: -1,
+      }
+    );
   }, []);
 
   const onSubmit = React.useCallback(
@@ -192,6 +211,34 @@ export function SignInForm(): React.JSX.Element {
         position: 'relative',
         zIndex: 2,
       }}>
+        <Box
+          ref={titleRef}
+          sx={{
+            position: 'absolute',
+            top: 3,
+            left: 0,
+            right: 0,
+            zIndex: 3,
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          <Typography
+            variant="h5"
+            sx={{
+              display: 'inline-block',
+              fontWeight: 900,
+              letterSpacing: '0.16em',
+              textTransform: 'uppercase',
+              background: 'linear-gradient(90deg, #ffcc33, #ff6b6b, #4dabf7, #51cf66)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: '0 4px 18px rgba(197, 193, 193, 0.55)',
+            }}
+          >
+            VERTEX ABACUS ACADEMY
+          </Typography>
+        </Box>
         <Paper elevation={10} sx={{
           position: 'relative',
           width: '100%',
