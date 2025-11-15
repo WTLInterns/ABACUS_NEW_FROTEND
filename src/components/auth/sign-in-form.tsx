@@ -140,20 +140,36 @@ export function SignInForm(): React.JSX.Element {
         sx={{
           position: 'fixed',
           inset: 0,
-          backgroundImage: 'url(/assets/adminBackground.png)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          filter: 'blur(12px)',
-          transform: 'scale(1.05)',
           zIndex: 0,
+          overflow: 'hidden',
         }}
-      />
-      {/* Background layer 2: sharp image fully visible without zoom */}
+      >
+        <Box
+          component="video"
+          src="/assets/adminBackground.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            filter: 'blur(12px)',
+            transform: 'scale(1.05)',
+          }}
+        />
+      </Box>
+      {/* Background layer 2: sharp video fully visible without zoom */}
       <Box
-        component="img"
-        src="/assets/adminBackground.png"
-        alt="Admin background"
+        component="video"
+        src="/assets/adminBackground.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
         sx={{
           position: 'fixed',
           inset: 0,
@@ -169,22 +185,22 @@ export function SignInForm(): React.JSX.Element {
         minHeight: '100vh',
         display: 'grid',
         placeItems: 'start',
-        px: 2,
-        pt: 2,
-        pb: 1,
-        marginTop: '-1rem',
+        px: 3,
+        pt: 3.5,
+        pb: 2.5,
+        marginTop: '-0.25rem',
         position: 'relative',
         zIndex: 2,
       }}>
         <Paper elevation={10} sx={{
           position: 'relative',
           width: '100%',
-          maxWidth: 320,
+          maxWidth: 400,
           borderRadius: 3,
           marginTop: '1.5rem',
-          p: { xs: 1.5, sm: 2 },
-          bgcolor: 'rgba(255,255,255,0.95)',
-          backdropFilter: 'blur(6px)'
+          p: { xs: 2.5, sm: 3 },
+          bgcolor: 'rgba(255,255,255,0.55)',
+          backdropFilter: 'blur(12px)'
         }}>
           <Stack spacing={1.5}>
             <Stack direction="row" justifyContent="center">
